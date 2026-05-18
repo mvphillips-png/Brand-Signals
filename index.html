@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Brand Underneath the Brand | Gravificer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0f0f0f;
+  --ink2:#2a2a2a;
+  --ink3:#666;
+  --rule:#d4d4d0;
+  --rule2:#ebebea;
+  --paper:#fafaf8;
+  --paper2:#f2f2ef;
+  --white:#ffffff;
+  --red:#c8001a;
+  --blue:#1a1a8c;
+  --amber:#8c4a00;
+  --green:#005c2a;
+}
+html,body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'DM Sans',sans-serif;
+  font-weight:300;
+  line-height:1.6;
+  min-height:100vh;
+}
+.wrap{max-width:820px;margin:0 auto;padding:48px 28px 100px;}
+
+/* HEADER */
+.hdr{border-top:5px solid var(--ink);padding:28px 0 22px;margin-bottom:44px;border-bottom:1px solid var(--rule);}
+.hdr-eye{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.25em;color:var(--ink3);text-transform:uppercase;margin-bottom:10px;}
+.hdr-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,9vw,80px);line-height:.95;letter-spacing:.02em;color:var(--ink);}
+.hdr-title em{color:var(--red);font-style:normal;}
+.hdr-sub{margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);letter-spacing:.12em;}
+
+/* INTRO */
+.intro-block{margin-bottom:36px;padding:22px 24px;border-left:4px solid var(--red);background:var(--white);}
+.intro-block p{font-size:15px;line-height:1.85;color:var(--ink2);font-weight:300;}
+
+/* FORM BLOCKS */
+.block{border:1px solid var(--rule);border-radius:2px;margin-bottom:16px;overflow:hidden;}
+.block-hd{background:var(--ink);color:var(--white);padding:10px 18px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.block-hd .req{color:#ff7070;}
+.block-bd{padding:20px 20px 16px;background:var(--white);}
+
+/* FIELDS */
+.fld{margin-bottom:14px;}
+.fld:last-child{margin-bottom:0;}
+.fld-lbl{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;}
+.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+input[type=text],select,textarea{
+  width:100%;background:var(--paper);border:1px solid var(--rule);border-radius:2px;
+  color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:400;
+  padding:10px 13px;outline:none;transition:border-color .15s,background .15s;-webkit-appearance:none;
+}
+input[type=text]:focus,select:focus,textarea:focus{border-color:var(--ink);background:var(--white);}
+select option{background:#fff;color:#0f0f0f;}
+textarea{resize:vertical;min-height:82px;line-height:1.65;}
+
+/* CHECKBOXES */
+.cb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px;}
+.cb-item{display:flex;align-items:center;gap:10px;border:1px solid var(--rule2);border-radius:2px;padding:10px 12px;cursor:pointer;background:var(--paper);transition:border-color .15s,background .15s;}
+.cb-item:hover{border-color:var(--ink);background:var(--white);}
+.cb-item input{accent-color:var(--red);width:13px;height:13px;flex-shrink:0;cursor:pointer;}
+.cb-item label{font-size:12px;color:var(--ink2);cursor:pointer;font-family:'DM Mono',monospace;}
+
+/* DEPTH */
+.depth-row{display:flex;gap:8px;flex-wrap:wrap;}
+.d-btn{flex:1;min-width:110px;background:var(--paper);border:1px solid var(--rule);color:var(--ink3);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:12px 10px;border-radius:2px;cursor:pointer;transition:all .15s;text-align:center;line-height:1.7;}
+.d-btn small{display:block;font-size:9px;opacity:.55;margin-top:1px;}
+.d-btn.on{border-color:var(--ink);color:var(--ink);background:var(--white);}
+
+/* RUN */
+.run-btn{width:100%;margin-top:4px;background:var(--ink);color:var(--white);border:none;border-radius:2px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.18em;padding:20px;cursor:pointer;transition:background .15s;}
+.run-btn:hover{background:var(--red);}
+.run-btn:disabled{background:var(--rule);color:var(--ink3);cursor:not-allowed;}
+
+/* ERROR */
+.err{display:none;margin-top:10px;padding:11px 15px;border-left:3px solid var(--red);background:#fff5f5;font-family:'DM Mono',monospace;font-size:12px;color:var(--red);}
+
+/* LOADING */
+.ldg{display:none;padding:60px 0;text-align:center;}
+.ldg-bar{height:2px;background:var(--rule2);max-width:220px;margin:0 auto 18px;overflow:hidden;border-radius:1px;}
+.ldg-fill{height:100%;width:40%;background:var(--ink);animation:sweep 1.6s ease-in-out infinite;}
+@keyframes sweep{0%{margin-left:-40%}100%{margin-left:100%}}
+.ldg-lbl{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);letter-spacing:.2em;text-transform:uppercase;}
+
+/* OUTPUT */
+.out{display:none;margin-top:8px;}
+
+/* Output masthead */
+.out-mast{border-top:5px solid var(--ink);padding:24px 0 20px;margin-bottom:2px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;border-bottom:1px solid var(--rule);}
+.out-brand{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,6vw,50px);color:var(--ink);line-height:1;}
+.out-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);letter-spacing:.1em;margin-top:6px;line-height:1.9;}
+.out-meta b{color:var(--ink2);}
+.xbtns{display:flex;gap:8px;align-items:flex-start;flex-shrink:0;}
+.xbtn{background:transparent;border:1px solid var(--rule);color:var(--ink3);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:8px 13px;border-radius:2px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.xbtn:hover{border-color:var(--ink);color:var(--ink);}
+.xbtn.pdf:hover{border-color:var(--red);color:var(--red);}
+
+/* PILLARS */
+.pillars{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:24px;}
+.p-card{background:var(--white);padding:26px 26px 22px;}
+.p-hd{display:flex;align-items:baseline;gap:13px;margin-bottom:14px;padding-bottom:13px;border-bottom:1px solid var(--rule2);}
+.p-tag{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.18em;padding:3px 9px 2px;border-radius:1px;flex-shrink:0;}
+.p-tag.art{background:var(--red);color:#fff;}
+.p-tag.energy{background:var(--blue);color:#fff;}
+.p-tag.knowledge{background:var(--amber);color:#fff;}
+.p-tag.patterns{background:var(--green);color:#fff;}
+.p-title{font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;color:var(--ink);line-height:1.3;}
+.p-body{font-size:14px;line-height:1.88;color:var(--ink2);}
+.p-body p+p{margin-top:11px;}
+.zap{margin-top:16px;padding:11px 15px;border-left:3px solid var(--rule2);font-family:'DM Mono',monospace;font-size:12px;color:var(--ink3);line-height:1.6;font-style:italic;}
+
+/* SIGNAL GAP — inverted */
+.sig-gap{background:var(--ink);color:#fff;padding:30px 26px;margin-top:1px;}
+.sg-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:8px;}
+.sg-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,4vw,34px);color:#fff;margin-bottom:18px;letter-spacing:.03em;}
+.sg-body{font-size:14px;line-height:1.88;color:rgba(255,255,255,.78);}
+.sg-body p+p{margin-top:11px;}
+.sg-stmt{margin-top:22px;padding:16px 18px;border:1px solid rgba(255,255,255,.22);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:#fff;line-height:1.6;background:rgba(255,255,255,.05);}
+
+/* RECS */
+.recs{background:var(--white);border:1px solid var(--rule);padding:26px;margin-top:1px;}
+.recs-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
+.recs-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,3vw,30px);color:var(--ink);margin-bottom:22px;letter-spacing:.03em;padding-bottom:14px;border-bottom:1px solid var(--rule2);}
+.rec{display:flex;gap:16px;padding:13px 0;border-bottom:1px solid var(--rule2);}
+.rec:last-child{border-bottom:none;}
+.rec-n{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--rule);flex-shrink:0;padding-top:1px;min-width:26px;}
+.rec-t{font-size:14px;line-height:1.75;color:var(--ink2);}
+
+/* REPORT FOOTER */
+.rpt-foot{margin-top:1px;padding:18px 26px;background:var(--paper2);border:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.rf-brand{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.08em;color:var(--ink);}
+.rf-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);}
+
+.again-btn{margin-top:32px;width:100%;background:transparent;border:1px solid var(--rule);color:var(--ink3);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:14px;cursor:pointer;border-radius:2px;transition:all .15s;}
+.again-btn:hover{border-color:var(--ink);color:var(--ink);}
+
+/* EDIT MODE */
+[contenteditable="true"]{outline:2px dashed var(--red)!important;border-radius:2px;padding:2px 4px;background:rgba(200,0,26,.03)!important;}
+
+@media(max-width:600px){
+  .fld-row{grid-template-columns:1fr;}
+  .out-mast{flex-direction:column;}
+  .xbtns{width:100%;}
+  .xbtn{flex:1;text-align:center;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hdr">
+    <div class="hdr-eye">Gravificer · Signal Architecture · MVANNP</div>
+    <div class="hdr-title">The Brand <em>Underneath</em> the Brand</div>
+    <div class="hdr-sub">GF-TOOL-004 · Diagnostic Instrument · Quirky Flash Chronicles</div>
+  </div>
+
+  <div class="intro-block">
+    <p>Every brand is saying two things at once — what it intends to say, and what it's actually communicating. Most owners only hear the first one. This read looks at both. Using the Gravificer four-pillar framework, I analyze how your brand shows up across its real touchpoints — the visual language, the emotional undercurrent, the expertise on display, and the patterns you can't see from the inside. What comes back is a clear-eyed diagnostic of the gap between how you present and how you land, written in plain language with no agenda except accuracy. You'll walk away knowing exactly what your brand is doing — and what it isn't.</p>
+  </div>
+
+  <div id="form-section">
+
+    <div class="block">
+      <div class="block-hd">01 — Brand Identity <span class="req">* required</span></div>
+      <div class="block-bd">
+        <div class="fld">
+          <label class="fld-lbl">Brand / Business Name *</label>
+          <input type="text" id="brand-name" placeholder="e.g. Bellis Realty Group">
+        </div>
+        <div class="fld">
+          <label class="fld-lbl">Industry Category *</label>
+          <select id="industry">
+            <option value="">— Select industry —</option>
+            <optgroup label="Professional Services">
+              <option>Real Estate (Solo Agent / Boutique Brokerage)</option>
+              <option>Law (Solo / Small Firm)</option>
+              <option>Financial Planning / Wealth Management</option>
+              <option>Accounting / Bookkeeping</option>
+              <option>Management Consulting</option>
+              <option>HR / Recruiting</option>
+            </optgroup>
+            <optgroup label="Wellness & Health">
+              <option>Health Coaching</option>
+              <option>Fitness (Gym / Personal Trainer / Online Coach)</option>
+              <option>Nutrition / Dietitian</option>
+              <option>Mental Health / Therapy Practice</option>
+              <option>Yoga / Movement Studio</option>
+              <option>Integrative / Functional Medicine</option>
+            </optgroup>
+            <optgroup label="Creative & Agency">
+              <option>Creative Agency / Studio</option>
+              <option>Branding / Design Studio</option>
+              <option>Photography / Videography</option>
+              <option>Copywriting / Content</option>
+              <option>Marketing Agency</option>
+              <option>PR / Communications</option>
+            </optgroup>
+            <optgroup label="Coaching & Education">
+              <option>Life Coaching</option>
+              <option>Business Coaching</option>
+              <option>Career Coaching</option>
+              <option>Online Education / Course Creator</option>
+              <option>Executive / Leadership Coaching</option>
+            </optgroup>
+            <optgroup label="Food & Hospitality">
+              <option>Restaurant / Café</option>
+              <option>Food Brand / CPG</option>
+              <option>Catering / Events</option>
+              <option>Bakery / Specialty Food</option>
+            </optgroup>
+            <optgroup label="Retail & Product">
+              <option>Skincare / Beauty</option>
+              <option>Apparel / Fashion Brand</option>
+              <option>Candles / Home Goods / Artisan Goods</option>
+              <option>Supplement / Wellness Product</option>
+              <option>Specialty Retail</option>
+            </optgroup>
+            <optgroup label="Home & Trade">
+              <option>Interior Design</option>
+              <option>Architecture / Residential Design</option>
+              <option>Home Services / Contractor</option>
+              <option>Landscaping / Garden Design</option>
+            </optgroup>
+            <optgroup label="Tech & Digital">
+              <option>SaaS / Software Product</option>
+              <option>App / Digital Product</option>
+              <option>Tech Consulting</option>
+            </optgroup>
+            <optgroup label="Other">
+              <option>Nonprofit / Community Organization</option>
+              <option>Personal Brand / Creator</option>
+              <option>Other</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="fld">
+          <label class="fld-lbl">Website URL <span style="color:var(--ink3);font-weight:300;text-transform:none;letter-spacing:0"> — optional</span></label>
+          <input type="text" id="website" placeholder="https://...">
+        </div>
+        <div class="fld">
+          <label class="fld-lbl">Social Media <span style="color:var(--ink3);font-weight:300;text-transform:none;letter-spacing:0"> — optional</span></label>
+          <input type="text" id="social" placeholder="@handle, platform, or leave blank">
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-hd">02 — Their Messaging</div>
+      <div class="block-bd">
+        <div class="fld">
+          <label class="fld-lbl">Their Tagline or Positioning Statement <span style="color:var(--ink3);font-weight:300;text-transform:none;letter-spacing:0"> — optional</span></label>
+          <input type="text" id="tagline" placeholder="Leave blank if unclear or absent — that absence is signal too">
+        </div>
+        <div class="fld">
+          <label class="fld-lbl">What They Actually Do <span style="color:var(--ink3);font-weight:300;text-transform:none;letter-spacing:0"> — optional, plain words</span></label>
+          <textarea id="what-they-do" placeholder="Describe what they do as a customer would experience it. Skip if unknown — the tool will work from industry and touchpoints alone."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-hd">03 — Touchpoints to Analyze</div>
+      <div class="block-bd">
+        <div class="cb-grid">
+          <div class="cb-item"><input type="checkbox" id="tp-web" checked><label for="tp-web">Website</label></div>
+          <div class="cb-item"><input type="checkbox" id="tp-logo"><label for="tp-logo">Logo / Visual ID</label></div>
+          <div class="cb-item"><input type="checkbox" id="tp-soc" checked><label for="tp-soc">Social Media</label></div>
+          <div class="cb-item"><input type="checkbox" id="tp-msg" checked><label for="tp-msg">Messaging / Copy</label></div>
+          <div class="cb-item"><input type="checkbox" id="tp-tone"><label for="tp-tone">Tone of Voice</label></div>
+          <div class="cb-item"><input type="checkbox" id="tp-bio"><label for="tp-bio">Bio / About Page</label></div>
+          <div class="cb-item"><input type="checkbox" id="tp-off"><label for="tp-off">Offers / Pricing</label></div>
+          <div class="cb-item"><input type="checkbox" id="tp-rev"><label for="tp-rev">Reviews / Testimonials</label></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-hd">04 — Raw Notes &amp; Observations (optional)</div>
+      <div class="block-bd">
+        <div class="fld">
+          <label class="fld-lbl">Paste any copy, bio text, captions, or your own observations</label>
+          <textarea id="raw-notes" style="min-height:100px;" placeholder="Paste website copy, Instagram captions, bio text, anything you've gathered..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-hd">05 — Analysis Depth</div>
+      <div class="block-bd">
+        <div class="depth-row">
+          <button class="d-btn on" data-d="standard" onclick="setDepth(this)">Standard<small>4 pillars + gap</small></button>
+          <button class="d-btn" data-d="deep" onclick="setDepth(this)">Deep Dive<small>+ recommendations</small></button>
+          <button class="d-btn" data-d="competitive" onclick="setDepth(this)">Competitive<small>+ category patterns</small></button>
+        </div>
+      </div>
+    </div>
+
+    <button class="run-btn" id="run-btn" onclick="runRead()">Run Signal Read →</button>
+    <div class="err" id="err"></div>
+
+  </div>
+
+  <div class="ldg" id="ldg">
+    <div class="ldg-bar"><div class="ldg-fill"></div></div>
+    <div class="ldg-lbl" id="ldg-lbl">Reading signal...</div>
+  </div>
+
+  <div class="out" id="out">
+
+    <div class="out-mast">
+      <div>
+        <div class="out-brand" id="o-brand"></div>
+        <div class="out-meta">
+          <b id="o-industry"></b><br>
+          <span id="o-date"></span> · Brand Signal Read · GF-TOOL-004
+        </div>
+      </div>
+      <div class="xbtns">
+        <button class="xbtn" onclick="toggleEdit()" id="edit-btn">✎ Edit</button>
+        <button class="xbtn" onclick="copyText()">Copy Text</button>
+        <button class="xbtn pdf" onclick="exportPDF()">↓ PDF</button>
+      </div>
+    </div>
+
+    <div class="pillars" id="pillars"></div>
+
+    <div class="sig-gap" id="sig-gap">
+      <div class="sg-lbl">Signal Gap</div>
+      <div class="sg-title">The Gap Between Perception &amp; Reality</div>
+      <div class="sg-body" id="sg-body"></div>
+    </div>
+
+    <div class="recs" id="recs" style="display:none">
+      <div class="recs-lbl">Signal Forward</div>
+      <div class="recs-title">Recommended Moves</div>
+      <div id="recs-body"></div>
+    </div>
+
+    <div class="rpt-foot">
+      <div class="rf-brand">Gravificer · MVANNP</div>
+      <div class="rf-note">quirkyflashchronicles.com · Diagnostic instrument, not professional advice.</div>
+    </div>
+
+    <button class="again-btn" onclick="document.getElementById('form-section').scrollIntoView({behavior:'smooth'})">← Run another signal read</button>
+
+  </div>
+
+</div>
+<script>
+const WORKER='https://gravificer-proxy.mvphillips.workers.dev/';
+let depth='standard',editMode=false;
+
+function setDepth(el){
+  document.querySelectorAll('.d-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  depth=el.dataset.d;
+}
+
+const msgs=['Reading surface patterns...','Mapping hidden forces...','Diagnosing Art layer...','Analyzing Energy signals...','Auditing Knowledge claims...','Tracing Patterns...','Calculating signal gap...','Rendering diagnostic...'];
+function startLoader(){
+  let i=0;
+  return setInterval(()=>{
+    const el=document.getElementById('ldg-lbl');
+    if(el) el.textContent=msgs[i%msgs.length];
+    i++;
+  },1800);
+}
+
+function getTouchpoints(){
+  const m={'tp-web':'Website','tp-logo':'Logo / Visual Identity','tp-soc':'Social Media','tp-msg':'Messaging & Copy','tp-tone':'Tone of Voice','tp-bio':'Bio / About Page','tp-off':'Offers / Pricing','tp-rev':'Reviews / Testimonials'};
+  return Object.entries(m).filter(([id])=>document.getElementById(id)?.checked).map(([,v])=>v);
+}
+
+function buildPrompt(data){
+  const di={
+    standard:'Deliver Art, Energy, Knowledge, Patterns plus Signal Gap. Recommendations array must be empty [].',
+    deep:'Deliver Art, Energy, Knowledge, Patterns plus Signal Gap plus 3-5 specific actionable Signal Forward recommendations.',
+    competitive:'Deliver Art, Energy, Knowledge, Patterns plus Signal Gap with category-wide pattern observations woven into Patterns, plus 3-5 Signal Forward recommendations comparing this brand to typical category behavior.'
+  };
+  return `You are a Gravificer — a signal architect and brand diagnostician who finds the idea underneath the idea. Run a Brand Signal Read on this brand.
+
+Voice: smart but not academic. Direct. Specific. Finds what is invisible to people inside the brand. Never generic.
+
+BRAND: ${data.brand}
+INDUSTRY: ${data.industry}
+TAGLINE / POSITIONING: ${data.tagline||'ABSENT — treat the lack of a clear positioning statement as a finding in itself'}
+WHAT THEY DO: ${data.whatTheyDo||'UNKNOWN — infer from brand name, industry, and any raw notes provided'}
+TOUCHPOINTS: ${data.touchpoints.join(', ')}
+${data.rawNotes?'RAW NOTES:\n'+data.rawNotes:''}
+
+DEPTH: ${depth.toUpperCase()} — ${di[depth]}
+
+Respond ONLY in valid JSON. No markdown. No preamble.
+
+{
+  "art":{"title":"5-8 word evocative title","body":"2-3 paragraphs on visual costume and form","zap":"One sharp sentence max 20 words."},
+  "energy":{"title":"5-8 word evocative title","body":"2-3 paragraphs on hidden emotional forces","zap":"One sharp sentence max 20 words."},
+  "knowledge":{"title":"5-8 word evocative title","body":"2-3 paragraphs on real vs claimed expertise","zap":"One sharp sentence max 20 words."},
+  "patterns":{"title":"5-8 word evocative title","body":"2-3 paragraphs on repeating structures across touchpoints","zap":"One sharp sentence max 20 words."},
+  "signalGap":{"body":"2 paragraphs on the gap between presentation and reality","statement":"One-sentence Signal Gap verdict max 40 words."},
+  "recommendations":[]
+}`;
+}
+
+async function runRead(){
+  const brand=document.getElementById('brand-name').value.trim();
+  const industry=document.getElementById('industry').value;
+  const errEl=document.getElementById('err');
+  errEl.style.display='none';
+  if(!brand){showErr('Brand name is required.');return;}
+  if(!industry){showErr('Please select an industry.');return;}
+
+  const data={
+    brand,industry,
+    tagline:document.getElementById('tagline').value.trim(),
+    whatTheyDo:document.getElementById('what-they-do').value.trim(),
+    touchpoints:getTouchpoints(),
+    rawNotes:document.getElementById('raw-notes').value.trim()
+  };
+
+  document.getElementById('run-btn').disabled=true;
+  document.getElementById('out').style.display='none';
+  document.getElementById('ldg').style.display='block';
+  document.getElementById('ldg').scrollIntoView({behavior:'smooth',block:'center'});
+  const timer=startLoader();
+
+  try{
+    const res=await fetch(WORKER,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2500,messages:[{role:'user',content:buildPrompt(data)}]})
+    });
+    clearInterval(timer);
+    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||'Worker request failed.');}
+    const result=await res.json();
+    const raw=result.content.map(b=>b.text||'').join('');
+    let parsed;
+    try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}
+    catch(e){throw new Error('Could not parse response — please try again.');}
+    render(parsed,data);
+  }catch(err){
+    clearInterval(timer);
+    document.getElementById('ldg').style.display='none';
+    document.getElementById('run-btn').disabled=false;
+    showErr(err.message);
+  }
+}
+
+function render(d,meta){
+  document.getElementById('ldg').style.display='none';
+  document.getElementById('o-brand').textContent=meta.brand;
+  document.getElementById('o-industry').textContent=meta.industry;
+  document.getElementById('o-date').textContent=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+
+  const pillars=[
+    {key:'art',tag:'ART',cls:'art',label:'Art'},
+    {key:'energy',tag:'ENERGY',cls:'energy',label:'Energy'},
+    {key:'knowledge',tag:'KNOWLEDGE',cls:'knowledge',label:'Knowledge'},
+    {key:'patterns',tag:'PATTERNS',cls:'patterns',label:'Patterns'}
+  ];
+  const container=document.getElementById('pillars');
+  container.innerHTML='';
+  pillars.forEach(p=>{
+    const pd=d[p.key];if(!pd)return;
+    const c=document.createElement('div');c.className='p-card';
+    const bHtml=(pd.body||'').split('\n').filter(l=>l.trim()).map(l=>'<p>'+esc(l)+'</p>').join('');
+    c.innerHTML='<div class="p-hd"><div class="p-tag '+p.cls+'">'+p.tag+'</div><div class="p-title">'+esc(pd.title||p.label)+'</div></div><div class="p-body">'+bHtml+(pd.zap?'<div class="zap">'+esc(pd.zap)+'</div>':'')+'</div>';
+    container.appendChild(c);
+  });
+
+  const gap=d.signalGap||d.signal_gap||{};
+  const sgBody=document.getElementById('sg-body');
+  sgBody.innerHTML='';
+  (gap.body||'').split('\n').filter(l=>l.trim()).forEach(l=>{
+    const p=document.createElement('p');p.textContent=l;p.style.marginBottom='11px';sgBody.appendChild(p);
+  });
+  if(gap.statement){
+    const s=document.createElement('div');s.className='sg-stmt';s.textContent=gap.statement;sgBody.appendChild(s);
+  }
+
+  const recs=d.recommendations||[];
+  const recsCard=document.getElementById('recs');
+  const recsBody=document.getElementById('recs-body');
+  if(recs.length){
+    recsCard.style.display='block';
+    recsBody.innerHTML=recs.map((r,i)=>'<div class="rec"><div class="rec-n">0'+(i+1)+'</div><div class="rec-t">'+esc(r)+'</div></div>').join('');
+  }else{recsCard.style.display='none';}
+
+  document.getElementById('run-btn').disabled=false;
+  document.getElementById('out').style.display='block';
+  document.getElementById('o-brand').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function showErr(m){const el=document.getElementById('err');el.textContent=m;el.style.display='block';}
+
+function toggleEdit(){
+  editMode=!editMode;
+  const btn=document.getElementById('edit-btn');
+  const sel='.p-body,.sg-body,.rec-t,.sg-stmt,.zap';
+  if(editMode){
+    btn.textContent='✓ Done';btn.style.borderColor='var(--green)';btn.style.color='var(--green)';
+    document.querySelectorAll(sel).forEach(el=>el.setAttribute('contenteditable','true'));
+  }else{
+    btn.textContent='✎ Edit';btn.style.borderColor='';btn.style.color='';
+    document.querySelectorAll('[contenteditable]').forEach(el=>el.removeAttribute('contenteditable'));
+  }
+}
+
+function copyText(){
+  const lines=[];
+  lines.push('BRAND SIGNAL READ — '+document.getElementById('o-brand').textContent);
+  lines.push(document.getElementById('o-industry').textContent+' · '+document.getElementById('o-date').textContent+'\n');
+  document.querySelectorAll('.p-card').forEach(c=>{
+    lines.push('['+c.querySelector('.p-tag').textContent+'] '+c.querySelector('.p-title').textContent);
+    lines.push(c.querySelector('.p-body').innerText);
+  });
+  const gb=document.getElementById('sg-body')?.innerText;
+  if(gb)lines.push('[SIGNAL GAP]\n'+gb);
+  const rb=document.getElementById('recs-body')?.innerText;
+  if(rb)lines.push('[SIGNAL FORWARD]\n'+rb);
+  lines.push('\nGravificer · MVANNP · quirkyflashchronicles.com');
+  const btn=document.querySelectorAll('.xbtn')[1];
+  navigator.clipboard.writeText(lines.join('\n\n'))
+    .then(()=>{btn.textContent='✓ Copied';setTimeout(()=>btn.textContent='Copy Text',2000);})
+    .catch(()=>alert('Copy failed — select and copy manually.'));
+}
+
+function exportPDF(){
+  const brand=document.getElementById('o-brand').textContent.replace(/\s+/g,'-').toLowerCase();
+  const btn=document.querySelector('.xbtn.pdf');
+  btn.textContent='Generating...';
+  html2pdf().set({
+    margin:[12,12,12,12],
+    filename:'brand-signal-read-'+brand+'.pdf',
+    image:{type:'jpeg',quality:0.96},
+    html2canvas:{scale:2,useCORS:true,backgroundColor:'#fafaf8'},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+    pagebreak:{mode:['avoid-all']}
+  }).from(document.getElementById('out')).save()
+    .then(()=>{btn.textContent='✓ Downloaded';setTimeout(()=>btn.textContent='↓ PDF',3000);})
+    .catch(()=>btn.textContent='↓ PDF');
+}
+</script>
+</body>
+</html>
