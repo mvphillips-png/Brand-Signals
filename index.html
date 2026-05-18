@@ -254,7 +254,7 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
   <div class="hdr">
     <div class="hdr-eye">Gravificer · Signal Architecture · MVANNP</div>
     <div class="hdr-title">The Brand <em>Underneath</em> the Brand</div>
-    <div class="hdr-sub">GF-TOOL-004 · Diagnostic Instrument · Quirky Flash Chronicles</div>
+    <div class="hdr-sub">GF-TOOL-004 · Gravificer Diagnostic Tools</div>
   </div>
 
   <div class="intro-block">
@@ -623,7 +623,7 @@ function copyText(){
   if(gb)lines.push('[SIGNAL GAP]\n'+gb);
   const rb=document.getElementById('recs-body')?.innerText;
   if(rb)lines.push('[SIGNAL FORWARD]\n'+rb);
-  lines.push('\nGravificer · MVANNP · quirkyflashchronicles.com');
+  lines.push('\nGravificer Diagnostic Tools · MVANNP');
   const btn=document.querySelectorAll('.xbtn')[1];
   navigator.clipboard.writeText(lines.join('\n\n'))
     .then(()=>{btn.textContent='✓ Copied';setTimeout(()=>btn.textContent='Copy Text',2000);})
