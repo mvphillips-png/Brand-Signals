@@ -258,7 +258,7 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
   </div>
 
   <div class="intro-block">
-    <p>Every brand is saying two things at once — what it intends to say, and what it's actually communicating. Most owners only hear the first one. This read looks at both. Using the Gravificer four-pillar framework, I analyze how your brand shows up across its real touchpoints — the visual language, the emotional undercurrent, the expertise on display, and the patterns you can't see from the inside. What comes back is a clear-eyed diagnostic of the gap between how you present and how you land, written in plain language with no agenda except accuracy. You'll walk away knowing exactly what your brand is doing — and what it isn't.</p>
+    <p>You built something real. This read is about making sure the world sees it the way you see it. Using a four-pillar framework — Art, Energy, Knowledge, and Patterns — I look at how your brand is actually showing up across its touchpoints and where the signal between what you offer and what people receive could be stronger. What comes back isn't a critique. It's a clear picture of what's working, what's getting in the way, and what becomes possible when those two things are aligned. Think of it as having an experienced Creative Director in your corner for an hour — someone who's genuinely excited about what you're building.</p>
   </div>
 
   <div id="form-section">
@@ -528,27 +528,37 @@ function buildPrompt(data){
     deep:'Deliver Art, Energy, Knowledge, Patterns plus Signal Gap plus 3-5 specific actionable Signal Forward recommendations.',
     competitive:'Deliver Art, Energy, Knowledge, Patterns plus Signal Gap with category-wide pattern observations woven into Patterns, plus 3-5 Signal Forward recommendations comparing this brand to typical category behavior.'
   };
-  return `You are a Gravificer — a signal architect and brand diagnostician who finds the idea underneath the idea. Run a Brand Signal Read on this brand.
+  return `You are an experienced Creative Director brought in to help a small business owner understand their brand more clearly — and see what's possible. You have genuine respect for what they've built. You are not here to criticize. You are here to be the most useful outside eye they've ever had on their business.
 
-Voice: smart but not academic. Direct. Specific. Finds what is invisible to people inside the brand. Never generic.
+Your tone is warm, direct, energetic, and forward-looking. You name what is working before you name what isn't. When something isn't landing, you explain why without condescension — and you always point toward the opportunity. You write like someone who has seen hundreds of brands and genuinely gets excited when they spot untapped potential.
+
+Never talk down. Never preach. Never use language that makes the owner feel incompetent or naive. The goal is for them to finish reading this and feel energized — not embarrassed.
 
 BRAND: ${data.brand}
 INDUSTRY: ${data.industry}
-TAGLINE / POSITIONING: ${data.tagline||'ABSENT — treat the lack of a clear positioning statement as a finding in itself'}
-WHAT THEY DO: ${data.whatTheyDo||'UNKNOWN — infer from brand name, industry, and any raw notes provided'}
+TAGLINE / POSITIONING: ${data.tagline||'Not provided — note if the absence is itself an opportunity to sharpen'}
+WHAT THEY DO: ${data.whatTheyDo||'Not provided — infer from brand name, industry, and any notes'}
 TOUCHPOINTS: ${data.touchpoints.join(', ')}
-${data.rawNotes?'RAW NOTES:\n'+data.rawNotes:''}
+${data.rawNotes?'NOTES & OBSERVATIONS:\n'+data.rawNotes:''}
 
 DEPTH: ${depth.toUpperCase()} — ${di[depth]}
+
+PILLAR GUIDANCE:
+- ART: Describe what their visual presence communicates. Acknowledge what is working, then identify what could be sharpened or made more distinctive. Frame as opportunity, not failure.
+- ENERGY: Name the emotional current running through their brand. Affirm what is genuine, then identify where the energy could be clearer or stronger.
+- KNOWLEDGE: Recognize the real expertise they bring. Identify where that expertise is visible and where it could be surfaced more powerfully.
+- PATTERNS: Observe what shows up consistently — both the strengths and the habits that may be limiting them. Frame patterns as things that can be redirected, not flaws.
+- SIGNAL GAP: The honest gap between how they present and how they could land — written as an opportunity statement, not a verdict. The owner should read this and think "yes, that's exactly it" not "ouch."
+- SIGNAL GAP STATEMENT: One sentence that captures the core opportunity. Energizing, specific, forward-looking.
 
 Respond ONLY in valid JSON. No markdown. No preamble.
 
 {
-  "art":{"title":"5-8 word evocative title","body":"2-3 paragraphs on visual costume and form","zap":"One sharp sentence max 20 words."},
-  "energy":{"title":"5-8 word evocative title","body":"2-3 paragraphs on hidden emotional forces","zap":"One sharp sentence max 20 words."},
-  "knowledge":{"title":"5-8 word evocative title","body":"2-3 paragraphs on real vs claimed expertise","zap":"One sharp sentence max 20 words."},
-  "patterns":{"title":"5-8 word evocative title","body":"2-3 paragraphs on repeating structures across touchpoints","zap":"One sharp sentence max 20 words."},
-  "signalGap":{"body":"2 paragraphs on the gap between presentation and reality","statement":"One-sentence Signal Gap verdict max 40 words."},
+  "art":{"title":"5-8 word title framing the opportunity","body":"2-3 paragraphs — acknowledge strengths first, then what could be sharpened","zap":"One forward-looking sentence max 20 words."},
+  "energy":{"title":"5-8 word title","body":"2-3 paragraphs — affirm genuine energy, then where it could be stronger","zap":"One energizing sentence max 20 words."},
+  "knowledge":{"title":"5-8 word title","body":"2-3 paragraphs — surface real expertise, then where it could shine more","zap":"One sentence max 20 words."},
+  "patterns":{"title":"5-8 word title","body":"2-3 paragraphs — name consistent strengths and redirectable habits","zap":"One sentence max 20 words."},
+  "signalGap":{"body":"2 paragraphs — the gap as an opportunity, not a failure","statement":"One energizing opportunity sentence max 40 words."},
   "recommendations":[]
 }`;
 }
