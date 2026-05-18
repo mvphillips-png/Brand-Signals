@@ -154,20 +154,97 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
 }
 
 @media print{
-  body{background:#fafaf8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .hdr,.intro-block,#form-section,.ldg,.again-btn{display:none!important;}
-  .out{display:block!important;}
+  /* suppress browser header/footer URL printing */
+  @page{margin:16mm 14mm;size:A4;}
+
+  body{
+    background:#fff!important;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+    font-size:13px;
+  }
+
+  /* hide everything except the report output */
+  .hdr,.intro-block,#form-section,.ldg,.again-btn,
+  .xbtns,script{display:none!important;}
+
   .wrap{padding:0!important;max-width:100%!important;}
-  .out-mast{border-top:4px solid #0f0f0f;padding:16px 0 12px;}
-  .xbtns{display:none!important;}
-  .pillars{gap:1px;}
-  .p-card{break-inside:avoid;page-break-inside:avoid;}
-  .sig-gap{break-inside:avoid;page-break-inside:avoid;background:#0f0f0f!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .sg-body{color:rgba(255,255,255,.78)!important;}
-  .sg-stmt{border:1px solid rgba(255,255,255,.22)!important;color:#fff!important;}
-  .recs{break-inside:avoid;page-break-inside:avoid;}
-  .rpt-foot{break-inside:avoid;}
-  .again-btn{display:none!important;}
+  .out{display:block!important;}
+
+  /* masthead */
+  .out-mast{
+    border-top:4px solid #0f0f0f!important;
+    padding:12px 0 10px!important;
+    margin-bottom:0!important;
+    border-bottom:1px solid #d4d4d0!important;
+  }
+  .out-brand{font-size:32px!important;}
+
+  /* pillar cards — no gaps, clean borders */
+  .pillars{
+    display:block!important;
+    border:1px solid #d4d4d0!important;
+    background:#d4d4d0!important;
+    margin-top:12px!important;
+  }
+  .p-card{
+    background:#fff!important;
+    padding:18px 20px 16px!important;
+    margin-bottom:1px!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  .p-hd{padding-bottom:10px!important;margin-bottom:10px!important;}
+  .p-body{font-size:13px!important;line-height:1.75!important;}
+  .zap{
+    margin-top:12px!important;
+    padding:9px 13px!important;
+    border-left:2px solid #d4d4d0!important;
+    font-size:11px!important;
+  }
+
+  /* signal gap — keep dark but reliable */
+  .sig-gap{
+    background:#0f0f0f!important;
+    color:#fff!important;
+    padding:20px!important;
+    margin-top:1px!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+  .sg-lbl{color:rgba(255,255,255,.5)!important;}
+  .sg-title{font-size:22px!important;margin-bottom:12px!important;}
+  .sg-body{color:rgba(255,255,255,.82)!important;font-size:13px!important;}
+  .sg-stmt{
+    margin-top:14px!important;
+    padding:12px 14px!important;
+    border:1px solid rgba(255,255,255,.3)!important;
+    color:#fff!important;
+    font-size:14px!important;
+  }
+
+  /* recs */
+  .recs{
+    padding:18px 20px!important;
+    margin-top:1px!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  .rec{padding:10px 0!important;}
+  .rec-t{font-size:13px!important;}
+
+  /* footer */
+  .rpt-foot{
+    padding:12px 20px!important;
+    margin-top:1px!important;
+    break-inside:avoid!important;
+  }
+  .rf-note{font-size:9px!important;}
+
+  /* hide any links from printing as URLs */
+  a[href]:after{content:none!important;}
 }
 </style>
 </head>
@@ -344,7 +421,7 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
       <div class="xbtns">
         <button class="xbtn" onclick="toggleEdit()" id="edit-btn">✎ Edit</button>
         <button class="xbtn" onclick="copyText()">Copy Text</button>
-        <button class="xbtn" onclick="printReport()">↓ Save as PDF</button>
+        <button class="xbtn" onclick="printReport()" title="Opens browser print dialog — choose Save as PDF, enable Background graphics">↓ Save as PDF</button>
         <button class="xbtn pdf" onclick="exportPDF()" title="Alternate PDF export">↓ PDF (alt)</button>
       </div>
     </div>
@@ -365,7 +442,7 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
 
     <div class="rpt-foot">
       <div class="rf-brand">Gravificer · MVANNP</div>
-      <div class="rf-note">quirkyflashchronicles.com · Diagnostic instrument, not professional advice.</div>
+      <div class="rf-note">Diagnostic instrument — not legal or business advice.</div>
     </div>
 
     <button class="again-btn" onclick="document.getElementById('form-section').scrollIntoView({behavior:'smooth'})">← Run another signal read</button>
