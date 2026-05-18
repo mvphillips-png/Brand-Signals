@@ -152,6 +152,23 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
   .xbtns{width:100%;}
   .xbtn{flex:1;text-align:center;}
 }
+
+@media print{
+  body{background:#fafaf8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .hdr,.intro-block,#form-section,.ldg,.again-btn{display:none!important;}
+  .out{display:block!important;}
+  .wrap{padding:0!important;max-width:100%!important;}
+  .out-mast{border-top:4px solid #0f0f0f;padding:16px 0 12px;}
+  .xbtns{display:none!important;}
+  .pillars{gap:1px;}
+  .p-card{break-inside:avoid;page-break-inside:avoid;}
+  .sig-gap{break-inside:avoid;page-break-inside:avoid;background:#0f0f0f!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .sg-body{color:rgba(255,255,255,.78)!important;}
+  .sg-stmt{border:1px solid rgba(255,255,255,.22)!important;color:#fff!important;}
+  .recs{break-inside:avoid;page-break-inside:avoid;}
+  .rpt-foot{break-inside:avoid;}
+  .again-btn{display:none!important;}
+}
 </style>
 </head>
 <body>
@@ -327,7 +344,8 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
       <div class="xbtns">
         <button class="xbtn" onclick="toggleEdit()" id="edit-btn">✎ Edit</button>
         <button class="xbtn" onclick="copyText()">Copy Text</button>
-        <button class="xbtn pdf" onclick="exportPDF()">↓ PDF</button>
+        <button class="xbtn" onclick="printReport()">↓ Save as PDF</button>
+        <button class="xbtn pdf" onclick="exportPDF()" title="Alternate PDF export">↓ PDF (alt)</button>
       </div>
     </div>
 
@@ -533,6 +551,10 @@ function copyText(){
   navigator.clipboard.writeText(lines.join('\n\n'))
     .then(()=>{btn.textContent='✓ Copied';setTimeout(()=>btn.textContent='Copy Text',2000);})
     .catch(()=>alert('Copy failed — select and copy manually.'));
+}
+
+function printReport(){
+  window.print();
 }
 
 function exportPDF(){
