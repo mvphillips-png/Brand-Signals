@@ -589,7 +589,7 @@ async function runRead(){
     const res=await fetch(WORKER,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2500,messages:[{role:'user',content:buildPrompt(data)}]})
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2500,messages:[{role:'user',content:buildPrompt(data)}]})
     });
     clearInterval(timer);
     if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||'Worker request failed.');}
