@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Brand Underneath the Brand | Gravificer</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -53,7 +53,8 @@ html,body{
 .fld{margin-bottom:14px;}
 .fld:last-child{margin-bottom:0;}
 .fld-lbl{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;}
-.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.opt{color:var(--ink3);font-weight:300;text-transform:none;letter-spacing:0;}
+.fld-hint{font-size:12px;color:var(--ink3);margin-top:6px;line-height:1.5;}
 input[type=text],select,textarea{
   width:100%;background:var(--paper);border:1px solid var(--rule);border-radius:2px;
   color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:400;
@@ -76,6 +77,12 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
 .d-btn small{display:block;font-size:9px;opacity:.55;margin-top:1px;}
 .d-btn.on{border-color:var(--ink);color:var(--ink);background:var(--white);}
 
+/* SEARCH TOGGLE */
+.toggle{display:flex;gap:12px;align-items:flex-start;margin-top:14px;padding:13px 14px;border:1px solid var(--rule2);background:var(--paper);border-radius:2px;cursor:pointer;}
+.toggle input{accent-color:var(--red);margin-top:3px;width:14px;height:14px;flex-shrink:0;cursor:pointer;}
+.toggle b{display:block;font-weight:600;font-size:13px;color:var(--ink);}
+.toggle span{font-size:12px;color:var(--ink3);line-height:1.5;}
+
 /* RUN */
 .run-btn{width:100%;margin-top:4px;background:var(--ink);color:var(--white);border:none;border-radius:2px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.18em;padding:20px;cursor:pointer;transition:background .15s;}
 .run-btn:hover{background:var(--red);}
@@ -86,23 +93,30 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
 
 /* LOADING */
 .ldg{display:none;padding:60px 0;text-align:center;}
+.ldg-step{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink);letter-spacing:.25em;text-transform:uppercase;margin-bottom:14px;}
 .ldg-bar{height:2px;background:var(--rule2);max-width:220px;margin:0 auto 18px;overflow:hidden;border-radius:1px;}
 .ldg-fill{height:100%;width:40%;background:var(--ink);animation:sweep 1.6s ease-in-out infinite;}
 @keyframes sweep{0%{margin-left:-40%}100%{margin-left:100%}}
 .ldg-lbl{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);letter-spacing:.2em;text-transform:uppercase;}
+.ldg-note{margin-top:14px;font-size:12px;color:var(--ink3);}
 
 /* OUTPUT */
 .out{display:none;margin-top:8px;}
-
-/* Output masthead */
 .out-mast{border-top:5px solid var(--ink);padding:24px 0 20px;margin-bottom:2px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;border-bottom:1px solid var(--rule);}
 .out-brand{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,6vw,50px);color:var(--ink);line-height:1;}
 .out-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);letter-spacing:.1em;margin-top:6px;line-height:1.9;}
 .out-meta b{color:var(--ink2);}
-.xbtns{display:flex;gap:8px;align-items:flex-start;flex-shrink:0;}
+.xbtns{display:flex;gap:8px;align-items:flex-start;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;max-width:360px;}
 .xbtn{background:transparent;border:1px solid var(--rule);color:var(--ink3);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:8px 13px;border-radius:2px;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .xbtn:hover{border-color:var(--ink);color:var(--ink);}
+.xbtn.pdf{border-color:var(--ink);color:var(--ink);}
 .xbtn.pdf:hover{border-color:var(--red);color:var(--red);}
+.xbtn:disabled{opacity:.5;cursor:wait;}
+
+/* RESEARCH STATUS */
+.rstat{margin-top:14px;padding:11px 15px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.65;border-left:3px solid var(--green);background:#f1f7f3;color:var(--green);}
+.rstat.warn{border-left-color:var(--amber);background:#fbf5ec;color:var(--amber);}
+.rstat .rs-note{display:block;color:var(--ink3);margin-top:3px;}
 
 /* PILLARS */
 .pillars{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:24px;}
@@ -118,7 +132,7 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
 .p-body p+p{margin-top:11px;}
 .zap{margin-top:16px;padding:11px 15px;border-left:3px solid var(--rule2);font-family:'DM Mono',monospace;font-size:12px;color:var(--ink3);line-height:1.6;font-style:italic;}
 
-/* SIGNAL GAP — inverted */
+/* SIGNAL GAP */
 .sig-gap{background:var(--ink);color:#fff;padding:30px 26px;margin-top:1px;}
 .sg-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:8px;}
 .sg-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,4vw,34px);color:#fff;margin-bottom:18px;letter-spacing:.03em;}
@@ -126,14 +140,21 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
 .sg-body p+p{margin-top:11px;}
 .sg-stmt{margin-top:22px;padding:16px 18px;border:1px solid rgba(255,255,255,.22);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:#fff;line-height:1.6;background:rgba(255,255,255,.05);}
 
-/* RECS */
-.recs{background:var(--white);border:1px solid var(--rule);padding:26px;margin-top:1px;}
+/* RECS + NOTES */
+.recs,.notes{background:var(--white);border:1px solid var(--rule);padding:26px;margin-top:1px;}
 .recs-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
 .recs-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,3vw,30px);color:var(--ink);margin-bottom:22px;letter-spacing:.03em;padding-bottom:14px;border-bottom:1px solid var(--rule2);}
+.notes .recs-title{font-size:clamp(18px,2.6vw,24px);margin-bottom:14px;padding-bottom:10px;}
 .rec{display:flex;gap:16px;padding:13px 0;border-bottom:1px solid var(--rule2);}
 .rec:last-child{border-bottom:none;}
 .rec-n{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--rule);flex-shrink:0;padding-top:1px;min-width:26px;}
 .rec-t{font-size:14px;line-height:1.75;color:var(--ink2);}
+.nlist{list-style:none;}
+.nlist li{font-size:13.5px;line-height:1.7;color:var(--ink2);padding:7px 0 7px 18px;position:relative;border-bottom:1px solid var(--rule2);}
+.nlist li:last-child{border-bottom:none;}
+.nlist li::before{content:"›";position:absolute;left:2px;color:var(--red);font-weight:600;}
+.nlist a{color:var(--blue);word-break:break-all;font-family:'DM Mono',monospace;font-size:11.5px;}
+.nlist .src-l{display:block;}
 
 /* REPORT FOOTER */
 .rpt-foot{margin-top:1px;padding:18px 26px;background:var(--paper2);border:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
@@ -147,103 +168,23 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
 [contenteditable="true"]{outline:2px dashed var(--red)!important;border-radius:2px;padding:2px 4px;background:rgba(200,0,26,.03)!important;}
 
 @media(max-width:600px){
-  .fld-row{grid-template-columns:1fr;}
   .out-mast{flex-direction:column;}
-  .xbtns{width:100%;}
+  .xbtns{width:100%;max-width:none;justify-content:stretch;}
   .xbtn{flex:1;text-align:center;}
 }
 
 @media print{
-  /* suppress browser header/footer URL printing */
-  @page{margin:16mm 14mm;size:A4;}
-
-  body{
-    background:#fff!important;
-    -webkit-print-color-adjust:exact;
-    print-color-adjust:exact;
-    font-size:13px;
-  }
-
-  /* hide everything except the report output */
-  .hdr,.intro-block,#form-section,.ldg,.again-btn,
-  .xbtns,script{display:none!important;}
-
+  @page{margin:16mm 14mm;}
+  body{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:13px;}
+  .hdr,.intro-block,#form-section,.ldg,.again-btn,.xbtns{display:none!important;}
   .wrap{padding:0!important;max-width:100%!important;}
   .out{display:block!important;}
-
-  /* masthead */
-  .out-mast{
-    border-top:4px solid #0f0f0f!important;
-    padding:12px 0 10px!important;
-    margin-bottom:0!important;
-    border-bottom:1px solid #d4d4d0!important;
-  }
+  .out-mast{padding:12px 0 10px!important;}
   .out-brand{font-size:32px!important;}
-
-  /* pillar cards — no gaps, clean borders */
-  .pillars{
-    display:block!important;
-    border:1px solid #d4d4d0!important;
-    background:#d4d4d0!important;
-    margin-top:12px!important;
-  }
-  .p-card{
-    background:#fff!important;
-    padding:18px 20px 16px!important;
-    margin-bottom:1px!important;
-    break-inside:avoid!important;
-    page-break-inside:avoid!important;
-  }
-  .p-hd{padding-bottom:10px!important;margin-bottom:10px!important;}
-  .p-body{font-size:13px!important;line-height:1.75!important;}
-  .zap{
-    margin-top:12px!important;
-    padding:9px 13px!important;
-    border-left:2px solid #d4d4d0!important;
-    font-size:11px!important;
-  }
-
-  /* signal gap — keep dark but reliable */
-  .sig-gap{
-    background:#0f0f0f!important;
-    color:#fff!important;
-    padding:20px!important;
-    margin-top:1px!important;
-    break-inside:avoid!important;
-    page-break-inside:avoid!important;
-    -webkit-print-color-adjust:exact!important;
-    print-color-adjust:exact!important;
-  }
-  .sg-lbl{color:rgba(255,255,255,.5)!important;}
-  .sg-title{font-size:22px!important;margin-bottom:12px!important;}
-  .sg-body{color:rgba(255,255,255,.82)!important;font-size:13px!important;}
-  .sg-stmt{
-    margin-top:14px!important;
-    padding:12px 14px!important;
-    border:1px solid rgba(255,255,255,.3)!important;
-    color:#fff!important;
-    font-size:14px!important;
-  }
-
-  /* recs */
-  .recs{
-    padding:18px 20px!important;
-    margin-top:1px!important;
-    break-inside:avoid!important;
-    page-break-inside:avoid!important;
-  }
-  .rec{padding:10px 0!important;}
-  .rec-t{font-size:13px!important;}
-
-  /* footer */
-  .rpt-foot{
-    padding:12px 20px!important;
-    margin-top:1px!important;
-    break-inside:avoid!important;
-  }
-  .rf-note{font-size:9px!important;}
-
-  /* hide any links from printing as URLs */
+  .pillars{display:block!important;margin-top:12px!important;}
+  .p-card,.sig-gap,.recs,.notes,.rpt-foot{break-inside:avoid;page-break-inside:avoid;}
+  .p-card{padding:18px 20px 16px!important;margin-bottom:1px!important;}
+  .sig-gap{background:#0f0f0f!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
   a[href]:after{content:none!important;}
 }
 </style>
@@ -264,20 +205,29 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
   <div id="form-section">
 
     <div class="block">
-      <div class="block-hd">01 — Brand Identity <span class="req">* required</span></div>
+      <div class="block-hd">01 — Brand Identity <span class="req">* name required</span></div>
       <div class="block-bd">
         <div class="fld">
-          <label class="fld-lbl">Brand / Business Name *</label>
+          <label class="fld-lbl" for="brand-name">Brand / Business Name *</label>
           <input type="text" id="brand-name" placeholder="e.g. Bellis Realty Group">
         </div>
         <div class="fld">
-          <label class="fld-lbl">Industry Category *</label>
+          <label class="fld-lbl" for="website">Website URL <span class="opt"> — optional, but the best starting point</span></label>
+          <input type="text" id="website" placeholder="https://...">
+        </div>
+        <div class="fld">
+          <label class="fld-lbl" for="social">Social Media <span class="opt"> — optional</span></label>
+          <input type="text" id="social" placeholder="@handle, platform, or profile link">
+        </div>
+        <div class="fld">
+          <label class="fld-lbl" for="industry">Industry Category <span class="opt"> — optional</span></label>
           <select id="industry">
-            <option value="">— Select industry —</option>
+            <option value="">— Let the research figure it out —</option>
             <optgroup label="Professional Services">
               <option>Real Estate (Solo Agent / Boutique Brokerage)</option>
               <option>Law (Solo / Small Firm)</option>
               <option>Financial Planning / Wealth Management</option>
+              <option>Mortgage / Lending</option>
               <option>Accounting / Bookkeeping</option>
               <option>Management Consulting</option>
               <option>HR / Recruiting</option>
@@ -382,14 +332,7 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
               <option>Other</option>
             </optgroup>
           </select>
-        </div>
-        <div class="fld">
-          <label class="fld-lbl">Website URL <span style="color:var(--ink3);font-weight:300;text-transform:none;letter-spacing:0"> — optional</span></label>
-          <input type="text" id="website" placeholder="https://...">
-        </div>
-        <div class="fld">
-          <label class="fld-lbl">Social Media <span style="color:var(--ink3);font-weight:300;text-transform:none;letter-spacing:0"> — optional</span></label>
-          <input type="text" id="social" placeholder="@handle, platform, or leave blank">
+          <div class="fld-hint">Pick one if the name is shared by other businesses — it helps the search find the right one.</div>
         </div>
       </div>
     </div>
@@ -398,12 +341,12 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
       <div class="block-hd">02 — Their Messaging</div>
       <div class="block-bd">
         <div class="fld">
-          <label class="fld-lbl">Their Tagline or Positioning Statement <span style="color:var(--ink3);font-weight:300;text-transform:none;letter-spacing:0"> — optional</span></label>
+          <label class="fld-lbl" for="tagline">Their Tagline or Positioning Statement <span class="opt"> — optional</span></label>
           <input type="text" id="tagline" placeholder="Leave blank if unclear or absent — that absence is signal too">
         </div>
         <div class="fld">
-          <label class="fld-lbl">What They Actually Do <span style="color:var(--ink3);font-weight:300;text-transform:none;letter-spacing:0"> — optional, plain words</span></label>
-          <textarea id="what-they-do" placeholder="Describe what they do as a customer would experience it. Skip if unknown — the tool will work from industry and touchpoints alone."></textarea>
+          <label class="fld-lbl" for="what-they-do">What They Actually Do <span class="opt"> — optional, plain words</span></label>
+          <textarea id="what-they-do" placeholder="Describe what they do as a customer would experience it. Add the city if they're local. Skip if unknown — the research will look it up."></textarea>
         </div>
       </div>
     </div>
@@ -428,8 +371,8 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
       <div class="block-hd">04 — Raw Notes &amp; Observations (optional)</div>
       <div class="block-bd">
         <div class="fld">
-          <label class="fld-lbl">Paste any copy, bio text, captions, or your own observations</label>
-          <textarea id="raw-notes" style="min-height:100px;" placeholder="Paste website copy, Instagram captions, bio text, anything you've gathered..."></textarea>
+          <label class="fld-lbl" for="raw-notes">Paste any copy, bio text, captions, or your own observations</label>
+          <textarea id="raw-notes" style="min-height:100px;" placeholder="Paste website copy, Instagram captions, bio text, anything you've gathered. Your notes outrank the web research if they disagree."></textarea>
         </div>
       </div>
     </div>
@@ -442,6 +385,10 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
           <button class="d-btn" data-d="deep" onclick="setDepth(this)">Deep Dive<small>+ recommendations</small></button>
           <button class="d-btn" data-d="competitive" onclick="setDepth(this)">Competitive<small>+ category patterns</small></button>
         </div>
+        <label class="toggle" for="do-search">
+          <input type="checkbox" id="do-search" checked>
+          <div><b>Search the web for this brand</b><span>Finds their site, socials and reviews first, so the read is grounded in what's really out there. Adds about a minute. Turn off to work only from what you've entered.</span></div>
+        </label>
       </div>
     </div>
 
@@ -451,8 +398,10 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
   </div>
 
   <div class="ldg" id="ldg">
+    <div class="ldg-step" id="ldg-step"></div>
     <div class="ldg-bar"><div class="ldg-fill"></div></div>
     <div class="ldg-lbl" id="ldg-lbl">Reading signal...</div>
+    <div class="ldg-note">A full read with research takes 1–2 minutes.</div>
   </div>
 
   <div class="out" id="out">
@@ -467,11 +416,14 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
       </div>
       <div class="xbtns">
         <button class="xbtn" onclick="toggleEdit()" id="edit-btn">✎ Edit</button>
-        <button class="xbtn" onclick="copyText()">Copy Text</button>
-        <button class="xbtn" onclick="printReport()" title="Opens browser print dialog — choose Save as PDF, enable Background graphics">↓ Save as PDF</button>
-        <button class="xbtn pdf" onclick="exportPDF()" title="Alternate PDF export">↓ PDF (alt)</button>
+        <button class="xbtn" onclick="copyText()" id="copy-btn">Copy Text</button>
+        <button class="xbtn" onclick="saveTxt()" id="txt-btn">↓ .txt</button>
+        <button class="xbtn pdf" onclick="savePDF()" id="pdf-btn">↓ Download PDF</button>
+        <button class="xbtn" onclick="window.print()" title="Browser print — choose Save as PDF and turn on Background graphics">Print</button>
       </div>
     </div>
+
+    <div class="rstat" id="rstat"></div>
 
     <div class="pillars" id="pillars"></div>
 
@@ -487,6 +439,18 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
       <div id="recs-body"></div>
     </div>
 
+    <div class="notes" id="verify" style="display:none">
+      <div class="recs-lbl">Before You Share</div>
+      <div class="recs-title">Worth a Second Look</div>
+      <ul class="nlist" id="verify-list"></ul>
+    </div>
+
+    <div class="notes" id="sources" style="display:none">
+      <div class="recs-lbl">Research Trail</div>
+      <div class="recs-title">What This Read Is Based On</div>
+      <ul class="nlist" id="src-list"></ul>
+    </div>
+
     <div class="rpt-foot">
       <div class="rf-brand">Gravificer · MVANNP</div>
       <div class="rf-note">This report is a brand diagnostic for informational purposes only. It does not constitute legal, financial, or professional consulting advice.</div>
@@ -499,7 +463,11 @@ textarea{resize:vertical;min-height:82px;line-height:1.65;}
 </div>
 <script>
 const WORKER='https://gravificer-proxy.mvphillips.workers.dev/';
+const MODEL='claude-sonnet-4-6';
+const SEARCH_TOOL={type:'web_search_20250305',name:'web_search',max_uses:5};
+const DISCLAIMER='This report is a brand diagnostic for informational purposes only. It does not constitute legal, financial, or professional consulting advice.';
 let depth='standard',editMode=false;
+const $=id=>document.getElementById(id);
 
 function setDepth(el){
   document.querySelectorAll('.d-btn').forEach(b=>b.classList.remove('on'));
@@ -507,158 +475,374 @@ function setDepth(el){
   depth=el.dataset.d;
 }
 
-const msgs=['Reading surface patterns...','Mapping hidden forces...','Diagnosing Art layer...','Analyzing Energy signals...','Auditing Knowledge claims...','Tracing Patterns...','Calculating signal gap...','Rendering diagnostic...'];
-function startLoader(){
-  let i=0;
-  return setInterval(()=>{
-    const el=document.getElementById('ldg-lbl');
-    if(el) el.textContent=msgs[i%msgs.length];
-    i++;
-  },1800);
+/* ---------------- loader ---------------- */
+let loaderTimer=null;
+const RESEARCH_MSGS=['Finding their website...','Reading their homepage...','Checking their socials...','Looking at reviews...','Gathering what\'s actually out there...'];
+const WRITE_MSGS=['Reading the Art layer...','Feeling for the Energy...','Surfacing the Knowledge...','Tracing the Patterns...','Measuring the signal gap...','Writing it up...'];
+function loader(step,msgs){
+  clearInterval(loaderTimer);
+  $('ldg-step').textContent=step;
+  const el=$('ldg-lbl'); let i=0; el.textContent=msgs[0];
+  loaderTimer=setInterval(()=>{i++;el.textContent=msgs[i%msgs.length];},2200);
 }
+function stopLoader(){clearInterval(loaderTimer);}
 
 function getTouchpoints(){
   const m={'tp-web':'Website','tp-logo':'Logo / Visual Identity','tp-soc':'Social Media','tp-msg':'Messaging & Copy','tp-tone':'Tone of Voice','tp-bio':'Bio / About Page','tp-off':'Offers / Pricing','tp-rev':'Reviews / Testimonials'};
-  return Object.entries(m).filter(([id])=>document.getElementById(id)?.checked).map(([,v])=>v);
+  return Object.entries(m).filter(([id])=>$(id)&&$(id).checked).map(([,v])=>v);
 }
 
-function buildPrompt(data){
+/* ---------------- API ---------------- */
+async function post(body){
+  let res;
+  try{ res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); }
+  catch(e){ throw new Error('Could not reach the Worker — check your connection and try again.'); }
+  if(!res.ok){
+    if(res.status===524||res.status===504) throw new Error('the request timed out ('+res.status+')');
+    const e=await res.json().catch(()=>({}));
+    throw new Error((e.error&&e.error.message)||('Worker returned '+res.status));
+  }
+  return res.json();
+}
+// Handles pause_turn: if the API pauses mid-search, hand its work back and let it continue.
+async function ask(body){
+  let messages=body.messages.slice(),all=[],last=null;
+  for(let round=0;round<4;round++){
+    last=await post(Object.assign({},body,{messages}));
+    const content=last.content||[];
+    all=all.concat(content);
+    if(last.stop_reason==='pause_turn'){messages=messages.concat([{role:'assistant',content}]);continue;}
+    break;
+  }
+  return {last,all};
+}
+const textOf=blocks=>(blocks||[]).filter(b=>b&&b.type==='text').map(b=>b.text||'').join('');
+function normUrl(u){return String(u||'').trim().replace(/^https?:\/\//i,'').replace(/^www\./i,'').replace(/[#?].*$/,'').replace(/\/+$/,'').toLowerCase();}
+const domainOf=u=>normUrl(u).split('/')[0];
+function domainsSeen(blocks){
+  const set=new Set();
+  (blocks||[]).forEach(b=>{
+    if(!b) return;
+    if(b.type==='web_search_tool_result'&&Array.isArray(b.content)) b.content.forEach(r=>{if(r&&r.url) set.add(domainOf(r.url));});
+    if(Array.isArray(b.citations)) b.citations.forEach(c=>{if(c&&c.url) set.add(domainOf(c.url));});
+  });
+  return set;
+}
+
+/* PARSE-START */
+// Escapes raw line breaks inside JSON strings (search replies sometimes contain them).
+function fixCtrl(s){
+  let out='',inStr=false,esc=false;
+  for(const c of s){
+    if(inStr){
+      if(esc){esc=false;out+=c;continue;}
+      if(c==='\\'){esc=true;out+=c;continue;}
+      if(c==='"'){inStr=false;out+=c;continue;}
+      if(c==='\n'){out+='\\n';continue;}
+      if(c==='\r') continue;
+      if(c==='\t'){out+='\\t';continue;}
+      out+=c;
+    }else{ if(c==='"') inStr=true; out+=c; }
+  }
+  return out;
+}
+function parseJSON(raw){
+  if(!raw) return null;
+  let s=String(raw).replace(/```json/gi,'').replace(/```/g,'').trim();
+  const a=s.indexOf('{');
+  if(a===-1) return null;
+  s=fixCtrl(s.slice(a));
+  const tryParse=t=>{try{return JSON.parse(t);}catch(e){return null;}};
+  // 1) strict: first { to last }
+  const b=s.lastIndexOf('}');
+  if(b!==-1){const strict=tryParse(s.slice(0,b+1)); if(strict) return strict;}
+  // 2) truncated reply: cut at the last completed element, then close any open brackets
+  let inStr=false,esc=false,lastSafe=-1;
+  for(let i=0;i<s.length;i++){const c=s[i];
+    if(inStr){if(esc)esc=false;else if(c==='\\')esc=true;else if(c==='"')inStr=false;continue;}
+    if(c==='"'){inStr=true;continue;}
+    if(c==='}'||c===']') lastSafe=i;
+  }
+  if(lastSafe!==-1){
+    let st=[],is=false,es=false;
+    for(let i=0;i<=lastSafe;i++){const c=s[i];
+      if(is){if(es)es=false;else if(c==='\\')es=true;else if(c==='"')is=false;continue;}
+      if(c==='"'){is=true;continue;}
+      if(c==='{'||c==='[') st.push(c==='{'?'}':']');
+      else if(c==='}'||c===']'){if(st.length) st.pop();}
+    }
+    let cand=s.slice(0,lastSafe+1).replace(/,\s*$/,'');
+    for(let k=st.length-1;k>=0;k--) cand+=st[k];
+    const rec=tryParse(cand); if(rec) return rec;
+  }
+  return null;
+}
+/* PARSE-END */
+
+/* ---------------- prompts ---------------- */
+function researchPrompt(d){
+  return `You are the research assistant for a Creative Director preparing a brand read on a business. Your ONLY job right now is to FIND and DESCRIBE what this brand actually puts into the world. Do not analyze or give advice yet.
+
+BRAND: ${d.brand}
+WEBSITE: ${d.website||'not given — find their official site'}
+SOCIAL: ${d.social||'not given'}
+INDUSTRY: ${d.industry||'not given — work it out from what you find'}
+TAGLINE (as given): ${d.tagline||'not given'}
+WHAT THEY DO (as given): ${d.whatTheyDo||'not given'}
+FOCUS ON: ${d.touchpoints.join(', ')||'their overall presence'}
+
+SEARCH DISCIPLINE (hard time budget): do AT MOST 4-5 searches, then STOP and write. Start with their website if given; otherwise search the brand name (plus industry or city if known) to find their official site. Then cover what you can of: their about/services pages, their social presence, and their reviews (Google, Yelp, or industry review sites).${d.depth==='competitive'?' Use ONE search to look at 2-3 similar businesses in the same category (same city if local) so the read can compare.':''}
+
+RULES:
+- Report only what you actually found. Verify, don't recall.
+- RIGHT BUSINESS CHECK: many businesses share names. Use the website, industry, city and any details given to confirm you have the right one. If you can't tell, say so in "identity_note" and only use results you're confident belong to this brand.
+- If you can't find their website, say so plainly. Never describe a site, feed or review you didn't see.
+- Short phrases from their own headlines and taglines are useful evidence — keep each under 15 words.
+- Notes, not essays. Keep every field tight.
+
+Return ONLY valid JSON, no markdown, no preamble:
+{
+ "found_site": true,
+ "site_url": "their official site, or empty",
+ "identity_note": "one sentence: how sure you are this is the right business, and why",
+ "industry_guess": "short category",
+ "location": "city/region if local, else empty",
+ "what_they_do": "plain-words description from what you found",
+ "visual": "what their site/socials look like: colors, type, photos, logo, overall feel",
+ "voice": "how their copy sounds, including 2-4 short phrases from their own headlines or taglines",
+ "offer": "services, products, pricing signals",
+ "proof": "reviews, ratings, testimonials, credentials — and the themes customers repeat",
+ "presence": "where they show up online, how active and consistent",
+ "standouts": ["specific things that stood out"],${d.depth==='competitive'?'\n "category": "how 2-3 similar businesses present themselves, named, and what the category tends to do",':''}
+ "sources": [{"label":"short description of the page","url":"https://..."}],
+ "unconfirmed": ["things you couldn't verify"]
+}
+CAPS: standouts up to 5, sources up to 8, unconfirmed up to 4.`;
+}
+
+function reportPrompt(d,research){
   const di={
     standard:'Deliver Art, Energy, Knowledge, Patterns plus Signal Gap. Recommendations array must be empty [].',
-    deep:'Deliver Art, Energy, Knowledge, Patterns plus Signal Gap plus 3-5 specific actionable Signal Forward recommendations.',
-    competitive:'Deliver Art, Energy, Knowledge, Patterns plus Signal Gap with category-wide pattern observations woven into Patterns, plus 3-5 Signal Forward recommendations comparing this brand to typical category behavior.'
+    deep:'Deliver Art, Energy, Knowledge, Patterns plus Signal Gap plus 3-5 specific, actionable Signal Forward recommendations.',
+    competitive:'Deliver Art, Energy, Knowledge, Patterns plus Signal Gap with category-wide pattern observations woven into Patterns, plus 3-5 Signal Forward recommendations comparing this brand to how its category typically behaves.'
   };
+  const len=depth==='standard'
+    ?'Each pillar body: 2 short paragraphs, about 110-160 words total.'
+    :'Each pillar body: 2-3 short paragraphs, about 150-210 words total.';
+  let evidence;
+  if(research){
+    const r=Object.assign({},research); delete r.sources;
+    evidence=`WEB RESEARCH — what was actually found online. This is your evidence:
+${JSON.stringify(r,null,1)}`;
+  }else{
+    evidence=`WEB RESEARCH: none available. You only have what's above. Do NOT describe their website, photos, reviews or social feeds as if you've seen them. Where judging something would require seeing it, say what to look at instead, and keep observations to what was provided.`;
+  }
   return `You are an experienced Creative Director brought in to help a small business owner understand their brand more clearly — and see what's possible. You have genuine respect for what they've built. You are not here to criticize. You are here to be the most useful outside eye they've ever had on their business.
 
 Your tone is warm, direct, energetic, and forward-looking. You name what is working before you name what isn't. When something isn't landing, you explain why without condescension — and you always point toward the opportunity. You write like someone who has seen hundreds of brands and genuinely gets excited when they spot untapped potential.
 
 Never talk down. Never preach. Never use language that makes the owner feel incompetent or naive. The goal is for them to finish reading this and feel energized — not embarrassed.
 
-BRAND: ${data.brand}
-INDUSTRY: ${data.industry}
-TAGLINE / POSITIONING: ${data.tagline||'Not provided — note if the absence is itself an opportunity to sharpen'}
-WHAT THEY DO: ${data.whatTheyDo||'Not provided — infer from brand name, industry, and any notes'}
-TOUCHPOINTS: ${data.touchpoints.join(', ')}
-${data.rawNotes?'NOTES & OBSERVATIONS:\n'+data.rawNotes:''}
+BRAND: ${d.brand}
+INDUSTRY: ${d.industry||(research&&research.industry_guess)||'Not specified — infer from the evidence'}
+WEBSITE: ${d.website||(research&&research.site_url)||'not given'}
+SOCIAL: ${d.social||'not given'}
+TAGLINE / POSITIONING: ${d.tagline||'Not provided — use the research; if they have no clear tagline, note whether that absence is an opportunity'}
+WHAT THEY DO: ${d.whatTheyDo||'Not provided — use the research'}
+TOUCHPOINTS TO FOCUS ON: ${d.touchpoints.join(', ')||'overall presence'}
+${d.rawNotes?'ANALYST NOTES (first-hand; these outrank the web research where they disagree):\n'+d.rawNotes+'\n':''}
+${evidence}
+
+GROUNDING RULES:
+- Tie every observation to something specific: a headline, a phrase from their copy, their photos, a review theme, a detail from the notes. Name it.
+- NAME-SWAP TEST: if a sentence would be just as true of any other business in their industry, replace it with something specific to this brand, or cut it.
+- Don't invent. If the evidence didn't confirm something, don't state it as fact — put it in "verify".
+- You may quote short phrases from their own copy (under 15 words).
 
 DEPTH: ${depth.toUpperCase()} — ${di[depth]}
 
 PILLAR GUIDANCE:
-- ART: Describe what their visual presence communicates. Acknowledge what is working, then identify what could be sharpened or made more distinctive. Frame as opportunity, not failure.
-- ENERGY: Name the emotional current running through their brand. Affirm what is genuine, then identify where the energy could be clearer or stronger.
-- KNOWLEDGE: Recognize the real expertise they bring. Identify where that expertise is visible and where it could be surfaced more powerfully.
-- PATTERNS: Observe what shows up consistently — both the strengths and the habits that may be limiting them. Frame patterns as things that can be redirected, not flaws.
-- SIGNAL GAP: The honest gap between how they present and how they could land — written as an opportunity statement, not a verdict. The owner should read this and think "yes, that's exactly it" not "ouch."
+- ART: What their visual presence communicates. Acknowledge what is working, then what could be sharpened or made more distinctive. Opportunity, not failure.
+- ENERGY: The emotional current running through their brand. Affirm what is genuine, then where the energy could be clearer or stronger.
+- KNOWLEDGE: The real expertise they bring. Where it's visible and where it could be surfaced more powerfully.
+- PATTERNS: What shows up consistently — strengths and the habits that may be limiting them. Patterns can be redirected; they aren't flaws.
+- SIGNAL GAP: The honest gap between how they present and how they could land — written as an opportunity, not a verdict. The owner should think "yes, that's exactly it," not "ouch."
 - SIGNAL GAP STATEMENT: One sentence that captures the core opportunity. Energizing, specific, forward-looking.
 
-Respond ONLY in valid JSON. No markdown. No preamble.
+LENGTH: ${len} Signal Gap body: 2 short paragraphs. Specific beats long.
+
+Respond ONLY in valid JSON. No markdown. No preamble. Separate paragraphs inside "body" with \\n\\n.
 
 {
-  "art":{"title":"5-8 word title framing the opportunity","body":"2-3 paragraphs — acknowledge strengths first, then what could be sharpened","zap":"One forward-looking sentence max 20 words."},
-  "energy":{"title":"5-8 word title","body":"2-3 paragraphs — affirm genuine energy, then where it could be stronger","zap":"One energizing sentence max 20 words."},
-  "knowledge":{"title":"5-8 word title","body":"2-3 paragraphs — surface real expertise, then where it could shine more","zap":"One sentence max 20 words."},
-  "patterns":{"title":"5-8 word title","body":"2-3 paragraphs — name consistent strengths and redirectable habits","zap":"One sentence max 20 words."},
-  "signalGap":{"body":"2 paragraphs — the gap as an opportunity, not a failure","statement":"One energizing opportunity sentence max 40 words."},
-  "recommendations":[]
-}`;
+  "art":{"title":"5-8 word title framing the opportunity","body":"acknowledge strengths first, then what could be sharpened","zap":"One forward-looking sentence, max 20 words."},
+  "energy":{"title":"5-8 word title","body":"affirm genuine energy, then where it could be stronger","zap":"One energizing sentence, max 20 words."},
+  "knowledge":{"title":"5-8 word title","body":"surface real expertise, then where it could shine more","zap":"One sentence, max 20 words."},
+  "patterns":{"title":"5-8 word title","body":"consistent strengths and redirectable habits","zap":"One sentence, max 20 words."},
+  "signalGap":{"body":"2 short paragraphs — the gap as an opportunity","statement":"One energizing opportunity sentence, max 40 words."},
+  "recommendations":[],
+  "verify":["anything the owner should confirm before this read is shared"]
+}
+CAPS: verify 0-4 items.`;
 }
 
+function repairPrompt(raw){
+  return `The text below was meant to be a single valid JSON object with the keys art, energy, knowledge, patterns (each {title, body, zap}), signalGap ({body, statement}), recommendations (array of strings) and verify (array of strings). Return it as valid JSON only — fix the syntax and keep the wording. No markdown, no commentary.
+
+${String(raw).slice(0,20000)}`;
+}
+
+/* ---------------- run ---------------- */
+function cleanResearch(r,seen,website){
+  const arr=v=>Array.isArray(v)?v.filter(Boolean):(v?[v]:[]);
+  r.standouts=arr(r.standouts).map(String).slice(0,5);
+  r.unconfirmed=arr(r.unconfirmed).map(String).slice(0,4);
+  const ok=new Set(seen);
+  if(website) ok.add(domainOf(website));
+  if(r.site_url&&seen.has(domainOf(r.site_url))) ok.add(domainOf(r.site_url));
+  // keep a link only if its domain really showed up in the search results
+  r.sources=arr(r.sources).map(s=>typeof s==='string'?{label:s}:s).filter(s=>s&&(s.label||s.url)).map(s=>{
+    const url=s.url&&/^https?:\/\//i.test(s.url)&&ok.has(domainOf(s.url))?s.url:'';
+    return {label:String(s.label||s.url||''),url};
+  }).slice(0,8);
+  return r;
+}
+const hasCore=r=>r&&r.art&&r.energy&&r.knowledge&&r.patterns&&(r.signalGap||r.signal_gap);
+
 async function runRead(){
-  const brand=document.getElementById('brand-name').value.trim();
-  const industry=document.getElementById('industry').value;
-  const errEl=document.getElementById('err');
-  errEl.style.display='none';
+  const brand=$('brand-name').value.trim();
+  $('err').style.display='none';
   if(!brand){showErr('Brand name is required.');return;}
-  if(!industry){showErr('Please select an industry.');return;}
 
   const data={
-    brand,industry,
-    tagline:document.getElementById('tagline').value.trim(),
-    whatTheyDo:document.getElementById('what-they-do').value.trim(),
+    brand,
+    industry:$('industry').value,
+    website:$('website').value.trim(),
+    social:$('social').value.trim(),
+    tagline:$('tagline').value.trim(),
+    whatTheyDo:$('what-they-do').value.trim(),
     touchpoints:getTouchpoints(),
-    rawNotes:document.getElementById('raw-notes').value.trim()
+    rawNotes:$('raw-notes').value.trim(),
+    search:$('do-search').checked,
+    depth
   };
 
-  document.getElementById('run-btn').disabled=true;
-  document.getElementById('out').style.display='none';
-  document.getElementById('ldg').style.display='block';
-  document.getElementById('ldg').scrollIntoView({behavior:'smooth',block:'center'});
-  const timer=startLoader();
+  if(editMode) toggleEdit();
+  $('run-btn').disabled=true;
+  $('out').style.display='none';
+  $('ldg').style.display='block';
+  $('ldg').scrollIntoView({behavior:'smooth',block:'center'});
 
+  let research=null,status;
   try{
-    const res=await fetch(WORKER,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2500,messages:[{role:'user',content:buildPrompt(data)}]})
-    });
-    clearInterval(timer);
-    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||'Worker request failed.');}
-    const result=await res.json();
-    const raw=result.content.map(b=>b.text||'').join('');
-    let parsed;
-    try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}
-    catch(e){throw new Error('Could not parse response — please try again.');}
-    render(parsed,data);
+    // PASS 1 — research (web search). If it fails, the read still runs on what was entered.
+    if(data.search){
+      loader('Step 1 of 2 · Researching',RESEARCH_MSGS);
+      try{
+        const r=await ask({model:MODEL,max_tokens:3000,tools:[SEARCH_TOOL],messages:[{role:'user',content:researchPrompt(data)}]});
+        let parsed=parseJSON(textOf(r.last.content))||parseJSON(textOf(r.all));
+        if(!parsed) throw new Error('the research notes came back unreadable');
+        research=cleanResearch(parsed,domainsSeen(r.all),data.website);
+        const n=research.sources.length;
+        if(research.found_site&&research.site_url){
+          status={ok:true,text:'Web-checked · found '+domainOf(research.site_url)+' · '+n+' source'+(n===1?'':'s'),note:research.identity_note||''};
+        }else{
+          status={ok:false,text:'Searched the web but couldn\'t confirm their website — this read leans on what you entered'+(n?' and the '+n+' source'+(n===1?'':'s')+' below':'')+'.',note:research.identity_note||''};
+        }
+      }catch(e){
+        research=null;
+        status={ok:false,text:'Web research didn\'t finish ('+e.message+') — this read is based only on what you entered.',note:''};
+      }
+    }else{
+      status={ok:false,text:'Web search was off — this read is based only on what you entered.',note:''};
+    }
+
+    // PASS 2 — write the read (no tools, full token budget for the writing)
+    loader(data.search?'Step 2 of 2 · Writing the read':'Writing the read',WRITE_MSGS);
+    const rep=await ask({model:MODEL,max_tokens:6000,messages:[{role:'user',content:reportPrompt(data,research)}]});
+    const rawReport=textOf(rep.last.content);
+    let report=parseJSON(rawReport);
+    if(!hasCore(report)&&rawReport){
+      loader('Tidying the output',['Reformatting...']);
+      const fix=await ask({model:MODEL,max_tokens:6000,messages:[{role:'user',content:repairPrompt(rawReport)}]});
+      const fixed=parseJSON(textOf(fix.last.content));
+      if(hasCore(fixed)) report=fixed;
+    }
+    if(!hasCore(report)) throw new Error('The report came back incomplete — please run it again.');
+    stopLoader();
+    render(report,data,research,status);
   }catch(err){
-    clearInterval(timer);
-    document.getElementById('ldg').style.display='none';
-    document.getElementById('run-btn').disabled=false;
-    showErr(err.message);
+    stopLoader();
+    $('ldg').style.display='none';
+    $('run-btn').disabled=false;
+    showErr(/timed out/.test(err.message)?'The read took too long and timed out. Try again, or switch to Standard depth.':err.message);
   }
 }
 
-function render(d,meta){
-  document.getElementById('ldg').style.display='none';
-  document.getElementById('o-brand').textContent=meta.brand;
-  document.getElementById('o-industry').textContent=meta.industry;
-  document.getElementById('o-date').textContent=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+/* ---------------- render ---------------- */
+const PILLARS=[
+  {key:'art',tag:'ART',cls:'art',label:'Art'},
+  {key:'energy',tag:'ENERGY',cls:'energy',label:'Energy'},
+  {key:'knowledge',tag:'KNOWLEDGE',cls:'knowledge',label:'Knowledge'},
+  {key:'patterns',tag:'PATTERNS',cls:'patterns',label:'Patterns'}
+];
+const splitParas=s=>String(s||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
+const asList=v=>Array.isArray(v)?v.filter(Boolean).map(x=>typeof x==='string'?x:(x.text||x.what||x.title||JSON.stringify(x))):(v?[String(v)]:[]);
 
-  const pillars=[
-    {key:'art',tag:'ART',cls:'art',label:'Art'},
-    {key:'energy',tag:'ENERGY',cls:'energy',label:'Energy'},
-    {key:'knowledge',tag:'KNOWLEDGE',cls:'knowledge',label:'Knowledge'},
-    {key:'patterns',tag:'PATTERNS',cls:'patterns',label:'Patterns'}
-  ];
-  const container=document.getElementById('pillars');
+function render(d,meta,research,status){
+  $('ldg').style.display='none';
+  $('o-brand').textContent=meta.brand;
+  const ind=meta.industry||(research&&research.industry_guess)||'';
+  $('o-industry').textContent=ind+(ind&&!meta.industry?' (from research)':'')+(research&&research.location?(ind?' · ':'')+research.location:'');
+  $('o-date').textContent=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+
+  const rs=$('rstat');
+  rs.className='rstat'+(status.ok?'':' warn');
+  rs.innerHTML=esc(status.text)+(status.note?'<span class="rs-note">'+esc(status.note)+'</span>':'');
+
+  const container=$('pillars');
   container.innerHTML='';
-  pillars.forEach(p=>{
+  PILLARS.forEach(p=>{
     const pd=d[p.key];if(!pd)return;
-    const c=document.createElement('div');c.className='p-card';
-    const bHtml=(pd.body||'').split('\n').filter(l=>l.trim()).map(l=>'<p>'+esc(l)+'</p>').join('');
+    const c=document.createElement('div');c.className='p-card';c.dataset.tag=p.tag;c.dataset.cls=p.cls;
+    const bHtml=splitParas(pd.body).map(l=>'<p>'+esc(l)+'</p>').join('');
     c.innerHTML='<div class="p-hd"><div class="p-tag '+p.cls+'">'+p.tag+'</div><div class="p-title">'+esc(pd.title||p.label)+'</div></div><div class="p-body">'+bHtml+(pd.zap?'<div class="zap">'+esc(pd.zap)+'</div>':'')+'</div>';
     container.appendChild(c);
   });
 
   const gap=d.signalGap||d.signal_gap||{};
-  const sgBody=document.getElementById('sg-body');
+  const sgBody=$('sg-body');
   sgBody.innerHTML='';
-  (gap.body||'').split('\n').filter(l=>l.trim()).forEach(l=>{
-    const p=document.createElement('p');p.textContent=l;p.style.marginBottom='11px';sgBody.appendChild(p);
-  });
-  if(gap.statement){
-    const s=document.createElement('div');s.className='sg-stmt';s.textContent=gap.statement;sgBody.appendChild(s);
-  }
+  splitParas(gap.body).forEach(l=>{const p=document.createElement('p');p.textContent=l;sgBody.appendChild(p);});
+  if(gap.statement){const s=document.createElement('div');s.className='sg-stmt';s.textContent=gap.statement;sgBody.appendChild(s);}
 
-  const recs=d.recommendations||[];
-  const recsCard=document.getElementById('recs');
-  const recsBody=document.getElementById('recs-body');
+  const recs=asList(d.recommendations);
   if(recs.length){
-    recsCard.style.display='block';
-    recsBody.innerHTML=recs.map((r,i)=>'<div class="rec"><div class="rec-n">0'+(i+1)+'</div><div class="rec-t">'+esc(r)+'</div></div>').join('');
-  }else{recsCard.style.display='none';}
+    $('recs').style.display='block';
+    $('recs-body').innerHTML=recs.map((r,i)=>'<div class="rec"><div class="rec-n">'+String(i+1).padStart(2,'0')+'</div><div class="rec-t">'+esc(r)+'</div></div>').join('');
+  }else{$('recs').style.display='none';$('recs-body').innerHTML='';}
 
-  document.getElementById('run-btn').disabled=false;
-  document.getElementById('out').style.display='block';
-  document.getElementById('o-brand').scrollIntoView({behavior:'smooth',block:'start'});
+  // Worth a second look: the report's own flags + anything research couldn't confirm
+  const seenV=new Set();
+  const ver=asList(d.verify).concat(research?research.unconfirmed:[]).filter(v=>{const k=v.toLowerCase().slice(0,60);if(seenV.has(k))return false;seenV.add(k);return true;}).slice(0,6);
+  $('verify').style.display=ver.length?'block':'none';
+  $('verify-list').innerHTML=ver.map(v=>'<li>'+esc(v)+'</li>').join('');
+
+  const src=research?research.sources:[];
+  $('sources').style.display=src.length?'block':'none';
+  $('src-list').innerHTML=src.map(s=>'<li><span class="src-l">'+esc(s.label)+'</span>'+(s.url?'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.url)+'</a>':'')+'</li>').join('');
+
+  $('run-btn').disabled=false;
+  $('out').style.display='block';
+  $('o-brand').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function showErr(m){const el=document.getElementById('err');el.textContent=m;el.style.display='block';}
+function showErr(m){const el=$('err');el.textContent=m;el.style.display='block';el.scrollIntoView({behavior:'smooth',block:'center'});}
 
 function toggleEdit(){
   editMode=!editMode;
-  const btn=document.getElementById('edit-btn');
-  const sel='.p-body,.sg-body,.rec-t,.sg-stmt,.zap';
+  const btn=$('edit-btn');
+  const sel='.p-title,.p-body p,.zap,.sg-body p,.sg-stmt,.rec-t,#verify-list li';
   if(editMode){
     btn.textContent='✓ Done';btn.style.borderColor='var(--green)';btn.style.color='var(--green)';
     document.querySelectorAll(sel).forEach(el=>el.setAttribute('contenteditable','true'));
@@ -668,43 +852,225 @@ function toggleEdit(){
   }
 }
 
-function copyText(){
-  const lines=[];
-  lines.push('BRAND SIGNAL READ — '+document.getElementById('o-brand').textContent);
-  lines.push(document.getElementById('o-industry').textContent+' · '+document.getElementById('o-date').textContent+'\n');
-  document.querySelectorAll('.p-card').forEach(c=>{
-    lines.push('['+c.querySelector('.p-tag').textContent+'] '+c.querySelector('.p-title').textContent);
-    lines.push(c.querySelector('.p-body').innerText);
+/* ---------------- export: reads what's on screen, so edits carry through ---------------- */
+function collectReport(){
+  const t=el=>el?el.innerText.replace(/\u00a0/g,' ').trim():'';
+  return {
+    brand:t($('o-brand')),
+    industry:t($('o-industry')),
+    date:t($('o-date')),
+    status:{text:$('rstat').firstChild?String($('rstat').firstChild.textContent).trim():'',note:t($('rstat').querySelector('.rs-note')),ok:!$('rstat').classList.contains('warn')},
+    pillars:[...document.querySelectorAll('#pillars .p-card')].map(c=>({
+      tag:c.dataset.tag,cls:c.dataset.cls,
+      title:t(c.querySelector('.p-title')),
+      paras:[...c.querySelectorAll('.p-body p')].map(t).filter(Boolean),
+      zap:t(c.querySelector('.zap'))
+    })),
+    gap:{paras:[...document.querySelectorAll('#sg-body p')].map(t).filter(Boolean),statement:t(document.querySelector('#sg-body .sg-stmt'))},
+    recs:$('recs').style.display==='none'?[]:[...document.querySelectorAll('#recs-body .rec-t')].map(t).filter(Boolean),
+    verify:[...document.querySelectorAll('#verify-list li')].map(t).filter(Boolean),
+    sources:[...document.querySelectorAll('#src-list li')].map(li=>({label:t(li.querySelector('.src-l')),url:li.querySelector('a')?li.querySelector('a').getAttribute('href'):''})),
+    disclaimer:DISCLAIMER
+  };
+}
+function fileSlug(m){return 'brand-underneath-'+(m.brand||'read').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'-'+new Date().toISOString().slice(0,10);}
+function flash(id,msg,orig){const b=$(id);b.textContent=msg;setTimeout(()=>{b.textContent=orig;},2000);}
+
+/* EXPORT-START */
+function buildText(m){
+  const L=[];
+  L.push('THE BRAND UNDERNEATH THE BRAND — '+m.brand);
+  L.push([m.industry,m.date].filter(Boolean).join(' · '));
+  if(m.status&&m.status.text) L.push(m.status.text+(m.status.note?'\n'+m.status.note:''));
+  m.pillars.forEach(p=>{
+    L.push('['+p.tag+'] '+p.title+'\n\n'+p.paras.join('\n\n')+(p.zap?'\n\n> '+p.zap:''));
   });
-  const gb=document.getElementById('sg-body')?.innerText;
-  if(gb)lines.push('[SIGNAL GAP]\n'+gb);
-  const rb=document.getElementById('recs-body')?.innerText;
-  if(rb)lines.push('[SIGNAL FORWARD]\n'+rb);
-  lines.push('\nGravificer Diagnostic Tools · MVANNP');
-  const btn=document.querySelectorAll('.xbtn')[1];
-  navigator.clipboard.writeText(lines.join('\n\n'))
-    .then(()=>{btn.textContent='✓ Copied';setTimeout(()=>btn.textContent='Copy Text',2000);})
-    .catch(()=>alert('Copy failed — select and copy manually.'));
+  L.push('[SIGNAL GAP]\n\n'+m.gap.paras.join('\n\n')+(m.gap.statement?'\n\n>> '+m.gap.statement:''));
+  if(m.recs.length) L.push('[SIGNAL FORWARD — RECOMMENDED MOVES]\n\n'+m.recs.map((r,i)=>(i+1)+'. '+r).join('\n'));
+  if(m.verify.length) L.push('[WORTH A SECOND LOOK]\n\n'+m.verify.map(v=>'- '+v).join('\n'));
+  if(m.sources.length) L.push('[WHAT THIS READ IS BASED ON]\n\n'+m.sources.map(s=>'- '+s.label+(s.url?'\n  '+s.url:'')).join('\n'));
+  L.push('Gravificer Diagnostic Tools · MVANNP\n'+m.disclaimer);
+  return L.join('\n\n');
 }
 
-function printReport(){
-  window.print();
+// jsPDF's built-in fonts only cover the Windows-1252 character set — swap or drop anything else.
+const WIN_EXTRA='€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ';
+function pdfSafe(s){
+  s=String(s||'').replace(/[→⟶➔]/g,'->').replace(/←/g,'<-').replace(/[\u2010\u2011\u2012]/g,'-').replace(/\u2212/g,'-')
+    .replace(/[\u00a0\u2000-\u200a\u202f]/g,' ').replace(/[\u200b-\u200d\ufeff]/g,'').replace(/\t/g,' ').replace(/[✓✔]/g,'').replace(/[✗✘]/g,'x');
+  s=s.replace(/ {2,}/g,' ');
+  return Array.from(s).filter(c=>{const n=c.codePointAt(0);return (n>=32&&n<127)||(n>=160&&n<256)||c==='\n'||WIN_EXTRA.includes(c);}).join('');
 }
 
-function exportPDF(){
-  const brand=document.getElementById('o-brand').textContent.replace(/\s+/g,'-').toLowerCase();
-  const btn=document.querySelector('.xbtn.pdf');
-  btn.textContent='Generating...';
-  html2pdf().set({
-    margin:[12,12,12,12],
-    filename:'brand-signal-read-'+brand+'.pdf',
-    image:{type:'jpeg',quality:0.96},
-    html2canvas:{scale:2,useCORS:true,backgroundColor:'#fafaf8'},
-    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-    pagebreak:{mode:['avoid-all']}
-  }).from(document.getElementById('out')).save()
-    .then(()=>{btn.textContent='✓ Downloaded';setTimeout(()=>btn.textContent='↓ PDF',3000);})
-    .catch(()=>btn.textContent='↓ PDF');
+function buildPDF(m){
+  const {jsPDF}=window.jspdf;
+  const P=new jsPDF({unit:'pt',format:'letter',compress:true});
+  const PW=P.internal.pageSize.getWidth(),PH=P.internal.pageSize.getHeight();
+  const M=54,CW=PW-2*M,BOTTOM=PH-50;
+  const C={ink:[15,15,15],ink2:[42,42,42],ink3:[102,102,102],rule:[212,212,208],rule2:[235,235,234],paper2:[242,242,239],
+           red:[200,0,26],blue:[26,26,140],amber:[140,74,0],green:[0,92,42],white:[255,255,255],gapTxt:[205,205,205]};
+  const TAGC={art:C.red,energy:C.blue,knowledge:C.amber,patterns:C.green};
+  let y=M;
+  const font=(fam,style,size,rgb)=>{P.setFont(fam,style);P.setFontSize(size);P.setTextColor(rgb[0],rgb[1],rgb[2]);};
+  const wrap=(s,w)=>P.splitTextToSize(pdfSafe(s),w);
+  const newPage=()=>{P.addPage();y=M;};
+  const need=h=>{if(y+h>BOTTOM){newPage();return true;}return false;};
+  const rule=(rgb,w)=>{P.setDrawColor(rgb[0],rgb[1],rgb[2]);P.setLineWidth(w||0.6);P.line(M,y,M+CW,y);};
+  // flowing paragraph across pages
+  const para=(s,x,w,size,lh,fam,style,rgb,bar)=>{
+    font(fam,style,size,rgb);
+    const lines=wrap(s,w);
+    lines.forEach(ln=>{
+      need(lh);
+      if(bar){P.setFillColor(bar[0],bar[1],bar[2]);P.rect(M,y,2,lh,'F');}
+      P.text(ln,x,y+size*0.86);y+=lh;
+    });
+  };
+  const label=(s,rgb)=>{font('courier','normal',8,rgb||C.ink3);P.setCharSpace(1.2);P.text(pdfSafe(s).toUpperCase(),M,y+7);P.setCharSpace(0);y+=14;};
+  const heading=(s,size)=>{font('helvetica','bold',size,C.ink);const lines=wrap(s,CW);lines.forEach(ln=>{need(size*1.2);P.text(ln,M,y+size*0.86);y+=size*1.2;});};
+
+  // ---- masthead ----
+  P.setFillColor(C.ink[0],C.ink[1],C.ink[2]);P.rect(M,y,CW,4,'F');y+=18;
+  label('Gravificer  ·  The Brand Underneath the Brand  ·  GF-TOOL-004');
+  y+=4;heading(m.brand||'Brand Signal Read',28);y+=4;
+  const metaLine=[m.industry,m.date,'Brand Signal Read'].filter(Boolean).join('  ·  ');
+  para(metaLine,M,CW,9,13,'courier','normal',C.ink3);
+  y+=8;rule(C.rule);y+=12;
+  if(m.status&&m.status.text){
+    const sc=m.status.ok?C.green:C.amber;
+    para(m.status.text,M+10,CW-10,8.5,12,'courier','normal',sc,sc);
+    if(m.status.note) para(m.status.note,M+10,CW-10,8.5,12,'courier','normal',C.ink3,sc);
+    y+=14;
+  }
+
+  // ---- pillars ----
+  m.pillars.forEach((p,i)=>{
+    need(90);
+    if(i>0){rule(C.rule2);y+=16;}
+    const tc=TAGC[p.cls]||C.ink;
+    font('helvetica','bold',8.5,C.white);P.setCharSpace(1.4);
+    const tw=P.getTextWidth(p.tag)+1.4*(p.tag.length-1)+14;
+    P.setFillColor(tc[0],tc[1],tc[2]);P.rect(M,y,tw,15,'F');P.text(p.tag,M+7,y+10.6);P.setCharSpace(0);
+    font('helvetica','bold',13,C.ink);const tl=wrap(p.title,CW-tw-12);
+    tl.forEach((ln,j)=>{P.text(ln,M+tw+12,y+11.5+j*16);});
+    y+=Math.max(15,tl.length*16)+12;
+    p.paras.forEach(t=>{para(t,M,CW,10.5,15.5,'helvetica','normal',C.ink2);y+=7;});
+    if(p.zap){y+=3;para(p.zap,M+12,CW-12,9.5,13.5,'helvetica','italic',C.ink3,C.rule);}
+    y+=18;
+  });
+
+  // ---- signal gap (dark panel, kept on one page when it fits) ----
+  {
+    const pad=20,iw=CW-2*pad;
+    font('helvetica','normal',10.5,C.gapTxt);
+    const bodyL=m.gap.paras.map(t=>wrap(t,iw));
+    font('helvetica','bold',11.5,C.white);
+    const stL=m.gap.statement?wrap(m.gap.statement,iw-24):[];
+    let h=pad+12+24+bodyL.reduce((a,l)=>a+l.length*15.5+7,0)+(stL.length?14+stL.length*16+22:0)+pad;
+    if(h<=BOTTOM-M){
+      need(h+6);
+      P.setFillColor(C.ink[0],C.ink[1],C.ink[2]);P.rect(M,y,CW,h,'F');
+      let gy=y+pad;
+      font('courier','normal',8,[150,150,150]);P.setCharSpace(1.2);P.text('SIGNAL GAP',M+pad,gy+7);P.setCharSpace(0);gy+=14;
+      font('helvetica','bold',15,C.white);P.text('The Gap Between Perception & Reality',M+pad,gy+13);gy+=24;
+      bodyL.forEach(lines=>{font('helvetica','normal',10.5,C.gapTxt);lines.forEach(ln=>{P.text(ln,M+pad,gy+9);gy+=15.5;});gy+=7;});
+      if(stL.length){
+        gy+=7;const bh=stL.length*16+20;
+        P.setDrawColor(110,110,110);P.setLineWidth(0.7);P.rect(M+pad,gy,iw,bh,'S');
+        font('helvetica','bold',11.5,C.white);stL.forEach((ln,j)=>{P.text(ln,M+pad+12,gy+15+j*16);});
+      }
+      y+=h+16;
+    }else{
+      // very long: fall back to a ruled section that can flow across pages
+      need(60);P.setFillColor(C.ink[0],C.ink[1],C.ink[2]);P.rect(M,y,CW,4,'F');y+=14;
+      label('Signal Gap');heading('The Gap Between Perception & Reality',15);y+=6;
+      m.gap.paras.forEach(t=>{para(t,M,CW,10.5,15.5,'helvetica','normal',C.ink2);y+=7;});
+      if(m.gap.statement){y+=4;para(m.gap.statement,M+12,CW-12,11.5,16,'helvetica','bold',C.ink,C.ink);}
+      y+=16;
+    }
+  }
+
+  const listSection=(lbl,title,items,numbered)=>{
+    if(!items.length) return;
+    need(70);rule(C.rule);y+=14;label(lbl);heading(title,15);y+=8;
+    items.forEach((it,i)=>{
+      font('helvetica','normal',10.5,C.ink2);const lines=wrap(it,CW-26);need(Math.min(lines.length,3)*15);
+      font(numbered?'helvetica':'helvetica','bold',numbered?11:10,numbered?C.rule:C.red);
+      P.text(numbered?String(i+1).padStart(2,'0'):'>',M,y+9);
+      font('helvetica','normal',10.5,C.ink2);
+      lines.forEach(ln=>{need(15);P.text(ln,M+26,y+9);y+=15;});
+      y+=6;
+    });
+    y+=8;
+  };
+  listSection('Signal Forward','Recommended Moves',m.recs,true);
+  listSection('Before You Share','Worth a Second Look',m.verify,false);
+
+  if(m.sources.length){
+    need(70);rule(C.rule);y+=14;label('Research Trail');heading('What This Read Is Based On',15);y+=8;
+    m.sources.forEach(s=>{
+      need(28);
+      font('helvetica','normal',10,C.ink2);
+      wrap(s.label,CW-14).forEach(ln=>{need(14);P.text(ln,M+14,y+9);y+=14;});
+      if(s.url){
+        font('courier','normal',8.5,C.blue);
+        const ul=P.splitTextToSize(pdfSafe(s.url),CW-14);
+        ul.forEach(ln=>{need(12);P.textWithLink(ln,M+14,y+8,{url:s.url});y+=12;});
+      }
+      y+=6;
+    });
+  }
+
+  // ---- closing note ----
+  y+=6;need(50);
+  font('courier','normal',8,C.ink3);const dl=wrap(m.disclaimer,CW-24);const dh=dl.length*12+20;
+  P.setFillColor(C.paper2[0],C.paper2[1],C.paper2[2]);P.rect(M,y,CW,dh,'F');
+  font('courier','normal',8,C.ink3);dl.forEach((ln,j)=>{P.text(ln,M+12,y+14+j*12);});
+  y+=dh;
+
+  // ---- page footers ----
+  const total=P.getNumberOfPages();
+  for(let pg=1;pg<=total;pg++){
+    P.setPage(pg);
+    P.setDrawColor(C.rule[0],C.rule[1],C.rule[2]);P.setLineWidth(0.5);P.line(M,PH-36,M+CW,PH-36);
+    font('helvetica','bold',8,C.ink);P.text('GRAVIFICER · MVANNP',M,PH-24);
+    font('courier','normal',7.5,C.ink3);P.text(pdfSafe(m.brand)+'  ·  p '+pg+' / '+total,PW-M,PH-24,{align:'right'});
+  }
+  return P;
+}
+/* EXPORT-END */
+
+function copyText(){
+  const txt=buildText(collectReport());
+  const fallback=()=>{
+    const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    let ok=false;try{ok=document.execCommand('copy');}catch(e){}
+    document.body.removeChild(ta);
+    ok?flash('copy-btn','✓ Copied','Copy Text'):alert('Copy was blocked by the browser — use the .txt download instead.');
+  };
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(txt).then(()=>flash('copy-btn','✓ Copied','Copy Text')).catch(fallback);
+  }else fallback();
+}
+
+function saveTxt(){
+  const m=collectReport();
+  const blob=new Blob([buildText(m)],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileSlug(m)+'.txt';
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+  flash('txt-btn','✓ Saved','↓ .txt');
+}
+
+function savePDF(){
+  if(!(window.jspdf&&window.jspdf.jsPDF)){alert('The PDF library didn\'t load — use Print → Save as PDF instead.');return;}
+  const btn=$('pdf-btn');btn.disabled=true;btn.textContent='Building...';
+  setTimeout(()=>{
+    try{const m=collectReport();buildPDF(m).save(fileSlug(m)+'.pdf');flash('pdf-btn','✓ Downloaded','↓ Download PDF');}
+    catch(e){btn.textContent='↓ Download PDF';alert('PDF failed ('+e.message+') — use Print → Save as PDF instead.');}
+    finally{btn.disabled=false;}
+  },30);
 }
 </script>
 </body>
